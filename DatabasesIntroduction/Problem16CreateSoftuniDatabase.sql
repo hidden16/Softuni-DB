@@ -1,0 +1,37 @@
+CREATE DATABASE [SoftUni]
+USE [SoftUni]
+
+CREATE TABLE [Towns](
+[Id] INT IDENTITY(1,1) NOT NULL,
+CONSTRAINT PK_SoftUni_TownsId PRIMARY KEY ([Id]),
+[Name] NVARCHAR(50) NOT NULL
+)
+
+CREATE TABLE [Adresses](
+[Id] INT IDENTITY(1,1) NOT NULL,
+CONSTRAINT PK_SoftUni_AdressesId PRIMARY KEY ([Id]),
+[AdressText] VARCHAR(50) NOT NULL,
+[TownId] INT NOT NULL,
+CONSTRAINT FK_SoftUni_TownId FOREIGN KEY ([TownId]) REFERENCES [Towns]([Id])
+)
+
+CREATE TABLE [Departments](
+[Id] INT IDENTITY(1,1) NOT NULL,
+CONSTRAINT PK_SoftUni_DepartmentsId PRIMARY KEY ([Id]), 
+[Name] NVARCHAR(50) NOT NULL
+)
+
+CREATE TABLE [Employees](
+[Id] INT IDENTITY(1,1) NOT NULL,
+CONSTRAINT PK_SoftUni_EmployeesId PRIMARY KEY ([Id]),
+[FirstName] NVARCHAR(50) NOT NULL,
+[MiddleName] NVARCHAR(50) NOT NULL,
+[LastName] NVARCHAR(50) NOT NULL,
+[JobTitle] NVARCHAR(50) NOT NULL,
+[DepartmentId] INT NOT NULL,
+CONSTRAINT FK_SoftUni_DepartmentId FOREIGN KEY ([DepartmentId]) REFERENCES [Departments]([Id]),
+[HireDate] DATE NOT NULL,
+[Salary] DECIMAL(9,2) NOT NULL,
+[AdressId] INT NOT NULL,
+CONSTRAINT FK_SoftUni_AdressId FOREIGN KEY ([AdressId]) REFERENCES [Adresses]([Id])
+)
