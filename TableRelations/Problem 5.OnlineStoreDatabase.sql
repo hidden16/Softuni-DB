@@ -1,0 +1,37 @@
+CREATE DATABASE [OnlineStore]
+
+CREATE TABLE [Cities](
+[CityID] INT PRIMARY KEY NOT NULL,
+[Name] VARCHAR(50) NOT NULL
+)
+
+CREATE TABLE [Customers](
+[CustomerID] INT PRIMARY KEY NOT NULL,
+[Name] VARCHAR(50) NOT NULL,
+[Birthday] DATE,
+[CityID] INT FOREIGN KEY ([CityID]) REFERENCES [Cities]([CityID])
+)
+
+CREATE TABLE [Orders](
+[OrderID] INT PRIMARY KEY NOT NULL,
+[CustomerID] INT FOREIGN KEY ([CustomerID]) REFERENCES [Customers]([CustomerID])
+)
+
+CREATE TABLE [ItemTypes](
+[ItemTypeID] INT PRIMARY KEY NOT NULL,
+[Name] VARCHAR(50) NOT NULL
+)
+
+CREATE TABLE [Items](
+[ItemID] INT PRIMARY KEY NOT NULL,
+[Name] VARCHAR(50) NOT NULL,
+[ItemTypeID] INT FOREIGN KEY ([ItemTypeID]) REFERENCES [ItemTypes]([ItemTypeID]) NOT NULL
+)
+
+CREATE TABLE [OrderItems](
+[OrderID] INT NOT NULL,
+[ItemID] INT NOT NULL,
+CONSTRAINT PK_OrderID_ItemID_OrderItems PRIMARY KEY ([OrderID],[ItemID]),
+CONSTRAINT FK_OrderID_OrderItems FOREIGN KEY ([OrderID]) REFERENCES [Orders]([OrderID]),
+CONSTRAINT FK_ItemID_OrderItems FOREIGN KEY ([ItemID]) REFERENCES [Items]([ItemID])
+)
