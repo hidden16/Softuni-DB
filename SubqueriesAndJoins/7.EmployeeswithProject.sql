@@ -6,5 +6,5 @@ FROM
 Employees AS e
 JOIN EmployeesProjects AS ee ON e.EmployeeID = ee.EmployeeID
 JOIN Projects AS p ON ee.ProjectID = p.ProjectID
-WHERE p.EndDate IS NULL
+WHERE p.StartDate > '2002-08-13' AND p.EndDate IS NULL
 
