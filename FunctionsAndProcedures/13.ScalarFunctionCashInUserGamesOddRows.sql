@@ -18,7 +18,7 @@ BEGIN
 			,GameId
 			,ROW_NUMBER() OVER (ORDER BY Cash DESC) AS RowNumber
 			FROM UsersGames
-			WHERE GameId = (SELECT Id FROM Games WHERE Name = @gameName)
+			WHERE GameId = (SELECT Id FROM Games WHERE [Name] = @gameName)
 			) AS gg
 			WHERE gg.RowNumber % 2 != 0
 		)
