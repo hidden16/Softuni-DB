@@ -1,7 +1,3 @@
-SELECT * FROM Employees
-SELECT * FROM Categories
-SELECT * FROM Reports
-
 CREATE OR ALTER PROCEDURE usp_AssignEmployeeToReport(@EmployeeId INT, @ReportId INT)
 AS
 BEGIN
