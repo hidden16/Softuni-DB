@@ -24,6 +24,7 @@ namespace ADONETExercises
             var villain = Console.ReadLine();
             result = commands.AddMinionToVillain(sqlConnection, minion, villain);
             Console.WriteLine(result);
+
             sqlConnection.Close();
         }
     }
