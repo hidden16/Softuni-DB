@@ -12,6 +12,10 @@ namespace ADONETExercises
             sqlConnection.Open();
             var result = commands.VillainsNamesWithMoreThan3Minions(sqlConnection);
             Console.WriteLine(result);
+
+            int id = int.Parse(Console.ReadLine());
+            result = commands.VillainsNameAndMinions(sqlConnection, id);
+            Console.WriteLine(result);
             sqlConnection.Close(); 
         }
     }
