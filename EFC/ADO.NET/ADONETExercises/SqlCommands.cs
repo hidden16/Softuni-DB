@@ -33,7 +33,7 @@ namespace ADONETExercises
         {
             sb = new StringBuilder();
             query = @$"SELECT Name FROM Villains WHERE Id = {id}";
-            SqlCommand cmd = new SqlCommand(query,sqlConnection);
+            SqlCommand cmd = new SqlCommand(query, sqlConnection);
             using SqlDataReader reader = cmd.ExecuteReader();
             while (reader.Read())
             {
@@ -66,6 +66,94 @@ namespace ADONETExercises
                 return $"(no minions)";
             }
             readerTwo.Close();
+            return sb.ToString().TrimEnd();
+        }
+        public string AddMinionToVillain(SqlConnection sqlConnection, string minion, string villain)
+        {
+            StringBuilder sb = new StringBuilder();
+            string[] minionInfo = minion.Split(": ", StringSplitOptions.RemoveEmptyEntries)[1].Split(" ", StringSplitOptions.RemoveEmptyEntries).ToArray();
+            string minionName = minionInfo[0];
+            int minionAge = int.Parse(minionInfo[1]);
+            string minionTown = minionInfo[2];
+
+            string[] villainInfo = villain.Split(": ", StringSplitOptions.RemoveEmptyEntries);
+            string villainName = villainInfo[1];
+
+            query = $@"SELECT Name FROM Towns WHERE Name = '{minionTown}'";
+            SqlCommand townSearchCmd = new SqlCommand(query, sqlConnection);
+            using SqlDataReader townReader = townSearchCmd.ExecuteReader();
+            townReader.Read();
+            var dbTownName = string.Empty;
+            while (townReader.Read())
+            {
+               dbTownName = (string)townReader["Name"];
+            }
+            townReader.Close();
+
+            query = $@"SELECT Name FROM Villains WHERE Name = '{villainName}'";
+            SqlCommand villainNameCmd = new SqlCommand(query, sqlConnection);
+            using SqlDataReader villainReader = villainNameCmd.ExecuteReader();
+            var dbVillainName = string.Empty;
+            while (villainReader.Read())
+            {
+                dbVillainName = (string)villainReader["Name"];
+            }
+            villainReader.Close();
+
+            query = $@"SELECT * FROM Minions AS m JOIN Towns AS t ON m.TownId = t.Id";
+            SqlTransaction transaction = sqlConnection.BeginTransaction();
+            try
+            {
+                if (dbTownName == "")
+                {
+                    var insertTownQuery = $@"INSERT INTO Towns (Name) VALUES ('{minionTown}')";
+                    SqlCommand insertTown = new SqlCommand(insertTownQuery, sqlConnection, transaction);
+                    insertTown.ExecuteNonQuery();
+                    sb.AppendLine($"Town {minionTown} was added to the database.");
+
+                    var selectTownIdQuery = $@"SELECT Id FROM Towns WHERE Name = '{minionTown}'";
+                    SqlCommand selectTownId = new SqlCommand(selectTownIdQuery, sqlConnection, transaction);
+                    using SqlDataReader townIdReader = selectTownId.ExecuteReader();
+                    townIdReader.Read();
+                    int dbTownId = (int)townIdReader["Id"];
+                    townIdReader.Close();
+
+                    var insertMinionQuery = $@"INSERT INTO Minions (Name, Age, TownId) VALUES ('{minionName}', {minionAge}, {dbTownId})";
+                    SqlCommand insertMinionInfo = new SqlCommand(insertMinionQuery, sqlConnection, transaction);
+                    insertMinionInfo.ExecuteNonQuery();
+                }
+                if (dbVillainName == "")
+                {
+                    var insertVillainQuery = $@"INSERT INTO Villains (Name, EvilnessFactorId)  VALUES ('{villainName}', 4)";
+                    SqlCommand insertVillain = new SqlCommand(insertVillainQuery, sqlConnection, transaction);
+                    insertVillain.ExecuteNonQuery();
+                    sb.AppendLine($"Villain {villainName} was added to the database.");
+                }
+
+                var selectMinionIdQuery = $@"SELECT Id FROM Minions WHERE Name = '{minionName}' AND Age = {minionAge}";
+                SqlCommand selectMinionId = new SqlCommand(selectMinionIdQuery, sqlConnection, transaction);
+                using SqlDataReader minionIdReader = selectMinionId.ExecuteReader();
+                minionIdReader.Read();
+                var dbMinionId = (int)minionIdReader["Id"];
+                minionIdReader.Close();
+
+                var selectVillainIdQuery = $@"SELECT Id FROM Villains WHERE Name = '{villainName}'";
+                SqlCommand selectVillainId = new SqlCommand(selectVillainIdQuery, sqlConnection, transaction);
+                using SqlDataReader villaindIdReader = selectVillainId.ExecuteReader();
+                villaindIdReader.Read();
+                var dbVillainId = (int)villaindIdReader["Id"];
+                villaindIdReader.Close();
+
+                var insertMinionsVillainsQuery = $@"INSERT INTO MinionsVillains (MinionId, VillainId) VALUES ({dbMinionId}, {dbVillainId})";
+                SqlCommand insertMinionVillain = new SqlCommand(insertMinionsVillainsQuery, sqlConnection, transaction);
+                insertMinionVillain.ExecuteNonQuery();
+                sb.AppendLine($"Successfully added {minionName} to be minion of {villainName}.");
+            }
+            catch (Exception ex)
+            {
+                transaction.Rollback();
+                return ex.Message;
+            }
             return sb.ToString().TrimEnd();
         }
     }
