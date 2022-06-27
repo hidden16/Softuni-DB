@@ -86,7 +86,7 @@ namespace ADONETExercises
             var dbTownName = string.Empty;
             while (townReader.Read())
             {
-               dbTownName = (string)townReader["Name"];
+                dbTownName = (string)townReader["Name"];
             }
             townReader.Close();
 
@@ -200,8 +200,11 @@ namespace ADONETExercises
             query = $@"SELECT Name FROM Villains WHERE Id = {villainId}";
             SqlCommand villainName = new SqlCommand(query, sqlConnection);
             using SqlDataReader villainNameReader = villainName.ExecuteReader();
-            villainNameReader.Read();
-            var name = villainNameReader["Name"];
+            var name = string.Empty;
+            while (villainNameReader.Read())
+            {
+                name = (string)villainNameReader["Name"];
+            }
             villainNameReader.Close();
 
             if (name == "")
@@ -211,7 +214,7 @@ namespace ADONETExercises
 
             query = $@"DELETE FROM MinionsVillains 
                        WHERE VillainId = {villainId}";
-            SqlCommand deleteMinionsAndVillainsId = new SqlCommand(query,sqlConnection);
+            SqlCommand deleteMinionsAndVillainsId = new SqlCommand(query, sqlConnection);
             var countOfDeletedMinions = deleteMinionsAndVillainsId.ExecuteNonQuery();
 
             query = $@"DELETE FROM Villains
