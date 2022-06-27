@@ -14,19 +14,20 @@ namespace ADONETExercises
             var result = commands.VillainsNamesWithMoreThan3Minions(sqlConnection);
             Console.WriteLine(result);
 
-            //Problem.03
+            ////Problem.03
             int id = int.Parse(Console.ReadLine());
             result = commands.VillainsNameAndMinions(sqlConnection, id);
             Console.WriteLine(result);
 
-            //Problem.04
+            ////Problem.04
             var minion = Console.ReadLine();
             var villain = Console.ReadLine();
             result = commands.AddMinionToVillain(sqlConnection, minion, villain);
             Console.WriteLine(result);
 
             //Problem.05
-
+            var countryName = Console.ReadLine();
+            commands.ChangeTownNamesCasing(sqlConnection, countryName);
 
             sqlConnection.Close();
         }

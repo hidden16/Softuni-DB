@@ -156,5 +156,43 @@ namespace ADONETExercises
             }
             return sb.ToString().TrimEnd();
         }
+        public void ChangeTownNamesCasing(SqlConnection sqlConnection, string countryName)
+        {
+            query = $@"SELECT Name
+                       FROM Countries
+                       WHERE Name = '{countryName}'";
+            SqlCommand selectCountryName = new SqlCommand(query, sqlConnection);
+            using SqlDataReader countryNameReader = selectCountryName.ExecuteReader();
+            countryNameReader.Read();
+            var country = countryNameReader["Name"];
+            countryNameReader.Close();
+
+            query = $@"SELECT t.Name 
+                       FROM Towns as t
+                       JOIN Countries AS c ON c.Id = t.CountryCode
+                      WHERE c.Name = '{countryName}'";
+            SqlCommand selectCountryTowns = new SqlCommand(query, sqlConnection);
+            using SqlDataReader countryTownsReader = selectCountryTowns.ExecuteReader();
+            List<string> townNames = new List<string>();
+            while (countryTownsReader.Read())
+            {
+                townNames.Add((string)countryTownsReader["Name"]);
+            }
+            countryTownsReader.Close();
+            if (country == "" || townNames.Count == 0)
+            {
+                Console.WriteLine("No town names were affected.");
+            }
+            else if (country != "" && townNames.Count > 0)
+            {
+                query = $@"UPDATE Towns
+                           SET Name = UPPER(Name)
+                         WHERE CountryCode = (SELECT c.Id FROM Countries AS c WHERE c.Name = '{countryName}')";
+                SqlCommand updateTownNames = new SqlCommand(query, sqlConnection);
+                var countOfUpdates = updateTownNames.ExecuteNonQuery();
+                Console.WriteLine($"{countOfUpdates} town names were affected.");
+                Console.WriteLine("[" + String.Join(", ", townNames) + "]");
+            }
+        }
     }
 }
