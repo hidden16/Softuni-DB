@@ -5,6 +5,11 @@
       "ProjectGuid": "614c3c7b-d9fc-4ab1-8cb9-70ea0303038c",
       "DisplayName": "ADONETExercises",
       "ColorIndex": 0
+    },
+    "a2fe74e1-b743-11d0-ae1a-00a0c90fffc3": {
+      "ProjectGuid": "a2fe74e1-b743-11d0-ae1a-00a0c90fffc3",
+      "DisplayName": "Miscellaneous Files",
+      "ColorIndex": -1
     }
   },
   "NextColorIndex": 1
