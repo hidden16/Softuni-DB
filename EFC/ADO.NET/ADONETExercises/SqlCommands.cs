@@ -194,5 +194,33 @@ namespace ADONETExercises
                 Console.WriteLine("[" + String.Join(", ", townNames) + "]");
             }
         }
+        public string RemoveVillain(SqlConnection sqlConnection, int villainId)
+        {
+            sb = new StringBuilder();
+            query = $@"SELECT Name FROM Villains WHERE Id = {villainId}";
+            SqlCommand villainName = new SqlCommand(query, sqlConnection);
+            using SqlDataReader villainNameReader = villainName.ExecuteReader();
+            villainNameReader.Read();
+            var name = villainNameReader["Name"];
+            villainNameReader.Close();
+
+            if (name == "")
+            {
+                return "No such villain was found.";
+            }
+
+            query = $@"DELETE FROM MinionsVillains 
+                       WHERE VillainId = {villainId}";
+            SqlCommand deleteMinionsAndVillainsId = new SqlCommand(query,sqlConnection);
+            var countOfDeletedMinions = deleteMinionsAndVillainsId.ExecuteNonQuery();
+
+            query = $@"DELETE FROM Villains
+                       WHERE Id = {villainId}";
+            SqlCommand deleteVillain = new SqlCommand(query, sqlConnection);
+            deleteVillain.ExecuteNonQuery();
+            sb.AppendLine($"{name} was deleted");
+            sb.AppendLine($"{countOfDeletedMinions} minions were released.");
+            return sb.ToString().TrimEnd();
+        }
     }
 }
