@@ -2,6 +2,7 @@
 using System;
 using System.Linq;
 using System.Text;
+using Microsoft.EntityFrameworkCore;
 
 namespace SoftUni
 {
@@ -12,6 +13,7 @@ namespace SoftUni
             SoftUniContext context = new SoftUniContext();
             string result = GetEmployeesFullInformation(context);
             result = GetEmployeesWithSalaryOver50000(context);
+            result = GetEmployeesFromResearchAndDevelopment(context);
             Console.WriteLine(result);
         }
         public static string GetEmployeesFullInformation(SoftUniContext context)
@@ -31,6 +33,17 @@ namespace SoftUni
                 sb.AppendLine($"{employee.FirstName} - {employee.Salary:f2}");
             }
             return sb.ToString().TrimEnd();
+        }
+        public static string GetEmployeesFromResearchAndDevelopment(SoftUniContext context)
+        {
+            StringBuilder sb = new StringBuilder();
+
+            foreach (var employee in context.Employees.Include(e=>e.Department).Where(e=>e.Department.Name == "Research and Development").OrderBy(e=>e.Salary).ThenByDescending(e=>e.FirstName))
+            {
+                sb.AppendLine($"{employee.FirstName} {employee.LastName} from {employee.Department.Name} - ${employee.Salary:f2}");
+            }
+
+            return sb.ToString().TrimEnd(); 
         }
     }
 }
