@@ -14,6 +14,7 @@ namespace SoftUni
             string result = GetEmployeesFullInformation(context);
             result = GetEmployeesWithSalaryOver50000(context);
             result = GetEmployeesFromResearchAndDevelopment(context);
+            result = AddNewAddressToEmployee(context);
             Console.WriteLine(result);
         }
         public static string GetEmployeesFullInformation(SoftUniContext context)
@@ -44,6 +45,31 @@ namespace SoftUni
             }
 
             return sb.ToString().TrimEnd(); 
+        }
+        public static string AddNewAddressToEmployee(SoftUniContext context)
+        {
+            StringBuilder sb = new StringBuilder();
+
+            Address address = new Address
+            {
+                AddressText = "Vitoshka 15",
+                TownId = 4
+            };
+            context.Addresses.Add(address);
+
+            context.Employees
+                .First(x => x.LastName == "Nakov")
+                .Address = address;
+            context.SaveChanges();
+            var employeeAddresses = context.Employees
+            .OrderByDescending(employee => employee.Address.AddressId)
+            .Take(10)
+            .Select(employee => employee.Address.AddressText);
+            foreach (var employeeAddress in employeeAddresses)
+            {
+                sb.AppendLine(employeeAddress);
+            }
+            return sb.ToString().TrimEnd();
         }
     }
 }
