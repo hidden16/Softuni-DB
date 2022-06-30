@@ -76,17 +76,17 @@ namespace SoftUni
         {
             StringBuilder sb = new StringBuilder();
 
-            DateTime smallDate = new DateTime(2001,1,1);
-            DateTime bigDate = new DateTime(2003,1,1);
+            DateTime smallDate = new DateTime(2001, 1, 1);
+            DateTime bigDate = new DateTime(2003, 1, 1);
             var employees = context.Employees
-                .Where(x=>x.EmployeesProjects.Any(x=>x.Project.StartDate >= smallDate && x.Project.StartDate <= bigDate))
-                .Select(x=> new
+                .Where(x => x.EmployeesProjects.Any(x => x.Project.StartDate >= smallDate && x.Project.StartDate <= bigDate))
+                .Select(x => new
                 {
                     FirstName = x.FirstName,
                     LastName = x.LastName,
                     ManagerFirstName = x.Manager.FirstName,
                     ManagerLastName = x.Manager.LastName,
-                    Projects = x.EmployeesProjects.Select(p=> new
+                    Projects = x.EmployeesProjects.Select(p => new
                     {
                         ProjectName = p.Project.Name,
                         ProjectStart = p.Project.StartDate,
