@@ -16,6 +16,7 @@ namespace SoftUni
             result = GetEmployeesFromResearchAndDevelopment(context);
             result = AddNewAddressToEmployee(context);
             result = GetEmployeesInPeriod(context);
+            result = GetAddressesByTown(context);
             Console.WriteLine(result);
         }
         public static string GetEmployeesFullInformation(SoftUniContext context)
@@ -103,6 +104,28 @@ namespace SoftUni
                     var endDate = project.ProjectEnd.HasValue ? project.ProjectEnd.Value.ToString("M/d/yyyy h:mm:ss tt") : "not finished";
                     sb.AppendLine($"--{project.ProjectName} - {startDate} - {endDate}");
                 }
+            }
+            return sb.ToString().TrimEnd();
+        }
+        public static string GetAddressesByTown(SoftUniContext context)
+        {
+            StringBuilder sb = new StringBuilder();
+
+            var employeesTown = context.Addresses
+                                    .Select(x=> new
+                                    {
+                                        AddressName = x.AddressText,
+                                        TownName = x.Town.Name,
+                                        EmployeeCount = x.Employees.Count
+                                    })
+                                    .OrderByDescending(x=>x.EmployeeCount)
+                                    .ThenBy(x=>x.TownName)
+                                    .ThenBy(x=>x.AddressName)
+                                    .Take(10);
+
+            foreach (var employee in employeesTown)
+            {
+                sb.AppendLine($"{employee.AddressName}, {employee.TownName} - {employee.EmployeeCount} employees");
             }
             return sb.ToString().TrimEnd();
         }
