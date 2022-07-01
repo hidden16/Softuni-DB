@@ -19,6 +19,7 @@ namespace SoftUni
             result = GetAddressesByTown(context);
             result = GetEmployee147(context);
             result = GetDepartmentsWithMoreThan5Employees(context);
+            result = GetLatestProjects(context);
             Console.WriteLine(result);
         }
         public static string GetEmployeesFullInformation(SoftUniContext context)
@@ -114,15 +115,15 @@ namespace SoftUni
             StringBuilder sb = new StringBuilder();
 
             var employeesTown = context.Addresses
-                                    .Select(x=> new
+                                    .Select(x => new
                                     {
                                         AddressName = x.AddressText,
                                         TownName = x.Town.Name,
                                         EmployeeCount = x.Employees.Count
                                     })
-                                    .OrderByDescending(x=>x.EmployeeCount)
-                                    .ThenBy(x=>x.TownName)
-                                    .ThenBy(x=>x.AddressName)
+                                    .OrderByDescending(x => x.EmployeeCount)
+                                    .ThenBy(x => x.TownName)
+                                    .ThenBy(x => x.AddressName)
                                     .Take(10);
 
             foreach (var employee in employeesTown)
@@ -142,12 +143,12 @@ namespace SoftUni
                                     FirstName = x.FirstName,
                                     LastName = x.LastName,
                                     JobTitle = x.JobTitle,
-                                    Projects = x.EmployeesProjects.Select(x=>x.Project.Name)
+                                    Projects = x.EmployeesProjects.Select(x => x.Project.Name)
                                 });
             foreach (var employee in employees)
             {
                 sb.AppendLine($"{employee.FirstName} {employee.LastName} - {employee.JobTitle}");
-                foreach (var project in employee.Projects.OrderBy(x=>x))
+                foreach (var project in employee.Projects.OrderBy(x => x))
                 {
                     sb.AppendLine(project);
                 }
@@ -173,10 +174,32 @@ namespace SoftUni
             foreach (var deparment in departments)
             {
                 sb.AppendLine($"{deparment.DepartmentName} - {deparment.ManagerFirstName} {deparment.ManagerLastName}");
-                foreach (var employee in deparment.Employees.OrderBy(x=>x.FirstName).ThenBy(x=>x.LastName))
+                foreach (var employee in deparment.Employees.OrderBy(x => x.FirstName).ThenBy(x => x.LastName))
                 {
                     sb.AppendLine($"{employee.FirstName} {employee.LastName} - {employee.JobTitle}");
                 }
+            }
+            return sb.ToString().TrimEnd();
+        }
+        public static string GetLatestProjects(SoftUniContext context)
+        {
+            StringBuilder sb = new StringBuilder();
+
+            var projects = context.Projects
+                .OrderByDescending(x => x.StartDate)
+                .Select(p => new
+                {
+                    ProjectName = p.Name,
+                    ProjectDescription = p.Description,
+                    ProjectStart = p.StartDate
+                })
+                .Take(10)
+                .OrderBy(x => x.ProjectName);
+            foreach (var project in projects)
+            {
+                sb.AppendLine($"{project.ProjectName}");
+                sb.AppendLine($"{project.ProjectDescription}");
+                sb.AppendLine($"{project.ProjectStart.ToString($"M/d/yyyy h:mm:ss tt")}");
             }
             return sb.ToString().TrimEnd();
         }
