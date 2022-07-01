@@ -21,6 +21,7 @@ namespace SoftUni
             result = GetDepartmentsWithMoreThan5Employees(context);
             result = GetLatestProjects(context);
             result = IncreaseSalaries(context);
+            result = GetEmployeesByFirstNameStartingWithSa(context);
             Console.WriteLine(result);
         }
         public static string GetEmployeesFullInformation(SoftUniContext context)
@@ -221,6 +222,21 @@ namespace SoftUni
             foreach (var item in employees)
             {
                 sb.AppendLine($"{item.FirstName} {item.LastName} (${item.Salary:f2})");
+            }
+            return sb.ToString().TrimEnd();
+        }
+        public static string GetEmployeesByFirstNameStartingWithSa(SoftUniContext context)
+        {
+            StringBuilder sb = new StringBuilder();
+
+            var employees = context.Employees
+                .Where(e=>e.FirstName.StartsWith("Sa"))
+                .OrderBy(e=>e.FirstName)
+                .ThenBy(e=>e.LastName);
+
+            foreach (var employee in employees)
+            {
+                sb.AppendLine($"{employee.FirstName} {employee.LastName} - {employee.JobTitle} - (${employee.Salary:f2})");
             }
             return sb.ToString().TrimEnd();
         }
