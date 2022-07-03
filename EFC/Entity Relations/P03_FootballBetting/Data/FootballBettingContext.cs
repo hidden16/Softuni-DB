@@ -45,22 +45,28 @@ namespace P03_FootballBetting.Data
             {
                 x.HasMany(x => x.PrimaryKitTeams)
                 .WithOne(x => x.PrimaryKitColor)
-                .HasForeignKey(x => x.PrimaryKitColorId);
+                .HasForeignKey(x => x.PrimaryKitColorId)
+                .OnDelete(DeleteBehavior.Restrict);
 
                 x.HasMany(x => x.SecondaryKitTeams)
                 .WithOne(x => x.SecondaryKitColor)
-                .HasForeignKey(x => x.SecondaryKitColorId);
+                .HasForeignKey(x => x.SecondaryKitColorId)
+                .OnDelete(DeleteBehavior.Restrict);
             });
 
             modelBuilder.Entity<Game>(x =>
             {
                 x.HasOne(x => x.HomeTeam)
                 .WithMany(x => x.HomeGames)
-                .HasForeignKey(x => x.HomeTeamId);
+                .HasForeignKey(x => x.HomeTeamId)
+                .OnDelete(DeleteBehavior.Restrict);
+
 
                 x.HasOne(x => x.AwayTeam)
                 .WithMany(x => x.AwayGames)
-                .HasForeignKey(x => x.AwayTeamId);
+                .HasForeignKey(x => x.AwayTeamId)
+                .OnDelete(DeleteBehavior.Restrict);
+
             });
             base.OnModelCreating(modelBuilder);
         }
