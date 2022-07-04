@@ -1,0 +1,21 @@
+{
+  "Version": 1,
+  "ProjectMap": {
+    "d51c77d6-1dff-46dd-936b-34bd8f20202c": {
+      "ProjectGuid": "d51c77d6-1dff-46dd-936b-34bd8f20202c",
+      "DisplayName": "P03_FootballBetting",
+      "ColorIndex": 0
+    },
+    "44f67a39-5859-4110-ab69-0db88331e368": {
+      "ProjectGuid": "44f67a39-5859-4110-ab69-0db88331e368",
+      "DisplayName": "DataConfiguration",
+      "ColorIndex": 1
+    },
+    "7558b510-272e-4e14-b378-44a1ed452cbb": {
+      "ProjectGuid": "7558b510-272e-4e14-b378-44a1ed452cbb",
+      "DisplayName": "ModelConfiguration",
+      "ColorIndex": 2
+    }
+  },
+  "NextColorIndex": 3
+}
