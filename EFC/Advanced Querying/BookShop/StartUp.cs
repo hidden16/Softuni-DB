@@ -13,7 +13,7 @@
             using var db = new BookShopContext();
             DbInitializer.ResetDatabase(db);
 
-          //  var input = Console.ReadLine();
+            //  var input = Console.ReadLine();
             //var commands = GetBooksByAgeRestriction(db, input);
             var commands = GetGoldenBooks(db);
             commands = GetBooksByPrice(db);
@@ -22,12 +22,12 @@
         public static string GetBooksByAgeRestriction(BookShopContext context, string command)
         {
             StringBuilder sb = new StringBuilder();
-            command = command.ToLower();
-            command = char.ToUpper(command[0]) + command.Substring(1);
-            foreach (var title in context.Books
-                                    .Where(x => x.AgeRestriction == (AgeRestriction)Enum.Parse(typeof(AgeRestriction), command))
-                                    .OrderBy(x=>x.Title)
-                                    .Select(x => x.Title))
+            AgeRestriction ageRestriction = Enum.Parse<AgeRestriction>(command, true);
+            var titles = context.Books
+                                    .Where(x => x.AgeRestriction == ageRestriction)
+                                    .OrderBy(x => x.Title)
+                                    .Select(x => x.Title);
+            foreach (var title in titles)
             {
                 sb.AppendLine(title);
             }
@@ -41,7 +41,7 @@
             var books = context.Books
                 .Where(x => (int)x.EditionType == 2 && x.Copies < 5000)
                 .ToList();
-            foreach (var book in books.OrderBy(x=>x.BookId))
+            foreach (var book in books.OrderBy(x => x.BookId))
             {
                 sb.AppendLine(book.Title);
             }
@@ -55,10 +55,18 @@
                 .Where(x => x.Price > 40)
                 .ToList();
 
-            foreach (var book in books.OrderByDescending(x=>x.Price))
+            foreach (var book in books.OrderByDescending(x => x.Price))
             {
                 sb.AppendLine($"{book.Title} - ${book.Price:f2}");
             }
+
+            return sb.ToString().TrimEnd();
+        }
+        public static string GetBooksNotReleasedIn(BookShopContext context, int year)
+        {
+            StringBuilder sb = new StringBuilder();
+
+
 
             return sb.ToString().TrimEnd();
         }
