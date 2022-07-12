@@ -15,8 +15,10 @@
 
             //  var input = Console.ReadLine();
             //var commands = GetBooksByAgeRestriction(db, input);
-            var commands = GetGoldenBooks(db);
-            commands = GetBooksByPrice(db);
+            //var commands = GetGoldenBooks(db);
+            //var commands = GetBooksByPrice(db);
+            int year = int.Parse(Console.ReadLine());
+            var commands = GetBooksNotReleasedIn(db, year);
             Console.WriteLine(commands);
         }
         public static string GetBooksByAgeRestriction(BookShopContext context, string command)
@@ -66,8 +68,14 @@
         {
             StringBuilder sb = new StringBuilder();
 
-
-
+            var books = context.Books
+                .Where(x=> x.ReleaseDate.Value.Year != year)
+                .ToList();
+           
+            foreach (var book in books.OrderBy(x=>x.BookId))
+            {
+                sb.AppendLine(book.Title);
+            }
             return sb.ToString().TrimEnd();
         }
     }
