@@ -31,8 +31,9 @@
             // var commands = GetBookTitlesContaining(db, input);
             // var commands = GetBooksByAuthor(db, input);
             //var commands = GetBooksByAuthor(db, input);
-            var input = int.Parse(Console.ReadLine());
-            var commands = CountBooks(db, input);
+            //var input = int.Parse(Console.ReadLine());
+            //var commands = CountBooks(db, input);
+            var commands = CountCopiesByAuthor(db);
             Console.WriteLine(commands);
         }
         public static string GetBooksByAgeRestriction(BookShopContext context, string command)
@@ -146,8 +147,8 @@
             var titlesAuthors = context.Books
                 .Include(x => x.Author)
                 .Where(x => EF.Functions.Like(x.Author.LastName, pattern))
-                .OrderBy(x=>x.BookId)
-                .Select(x=> $"{x.Title} ({x.Author.FirstName} {x.Author.LastName})")
+                .OrderBy(x => x.BookId)
+                .Select(x => $"{x.Title} ({x.Author.FirstName} {x.Author.LastName})")
                 .ToList();
             return String.Join(Environment.NewLine, titlesAuthors);
         }
@@ -157,6 +158,24 @@
                 .Where(x => x.Title.Length > lengthCheck)
                 .ToList();
             return booksNumber.Count;
+        }
+        public static string CountCopiesByAuthor(BookShopContext context)
+        {
+            StringBuilder sb = new StringBuilder();
+            var authorCopies = context.Authors
+                .Include(x => x.Books)
+                .Select(x => new
+                {
+                    FirstName = x.FirstName,
+                    LastName = x.LastName,
+                    Copies = x.Books.Select(x => x.Copies)
+                })
+                .ToList();
+            foreach (var author in authorCopies.OrderByDescending(x=>x.Copies.Sum()))
+            {
+                sb.AppendLine($"{author.FirstName} {author.LastName} - {author.Copies.Sum()}");
+            }
+            return sb.ToString().TrimEnd();
         }
     }
 }
