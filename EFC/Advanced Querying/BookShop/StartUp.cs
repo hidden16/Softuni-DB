@@ -161,21 +161,12 @@
         }
         public static string CountCopiesByAuthor(BookShopContext context)
         {
-            StringBuilder sb = new StringBuilder();
             var authorCopies = context.Authors
                 .Include(x => x.Books)
-                .Select(x => new
-                {
-                    FirstName = x.FirstName,
-                    LastName = x.LastName,
-                    Copies = x.Books.Select(x => x.Copies)
-                })
+                .OrderByDescending(x=>x.Books.Select(x=>x.Copies).Sum())
+                .Select(x => $"{x.FirstName} {x.LastName} - {x.Books.Select(x=>x.Copies).Sum()}")
                 .ToList();
-            foreach (var author in authorCopies.OrderByDescending(x=>x.Copies.Sum()))
-            {
-                sb.AppendLine($"{author.FirstName} {author.LastName} - {author.Copies.Sum()}");
-            }
-            return sb.ToString().TrimEnd();
+            return String.Join(Environment.NewLine, authorCopies);
         }
     }
 }
