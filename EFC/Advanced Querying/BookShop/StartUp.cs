@@ -7,6 +7,7 @@
     using Microsoft.EntityFrameworkCore;
     using System;
     using System.Collections.Generic;
+    using System.Globalization;
     using System.Linq;
     using System.Text;
     public class StartUp
@@ -21,8 +22,10 @@
             //var commands = GetGoldenBooks(db);
             //var commands = GetBooksByPrice(db);
             //int year = int.Parse(Console.ReadLine());
-            var words = Console.ReadLine();
-            var commands = GetBooksByCategory(db, words);
+            //var words = Console.ReadLine();
+            //var commands = GetBooksByCategory(db, words);
+            var date = Console.ReadLine();
+            var commands = GetBooksReleasedBefore(db, date);
             Console.WriteLine(commands);
         }
         public static string GetBooksByAgeRestriction(BookShopContext context, string command)
@@ -91,6 +94,26 @@
                 .OrderBy(x=>x)
                 .ToList();
             return String.Join("\n", books);
+        }
+        public static string GetBooksReleasedBefore(BookShopContext context, string date)
+        {
+            StringBuilder sb = new StringBuilder();
+            var ci = new CultureInfo("EN-US");
+            var books = context.Books
+                .Where(x => x.ReleaseDate < DateTime.ParseExact(date,"dd-MM-yyyy",ci))
+                .OrderByDescending(x=>x.ReleaseDate)
+                .Select(x => new
+                {
+                    Title = x.Title,
+                    Edition = x.EditionType,
+                    Price = x.Price
+                })
+                .ToList();
+            foreach (var book in books)
+            {
+                sb.AppendLine($"{book.Title} - {book.Edition} - ${book.Price:f2}");
+            }
+            return sb.ToString().TrimEnd();
         }
     }
 }
