@@ -24,8 +24,10 @@
             //int year = int.Parse(Console.ReadLine());
             //var words = Console.ReadLine();
             //var commands = GetBooksByCategory(db, words);
-            var date = Console.ReadLine();
-            var commands = GetBooksReleasedBefore(db, date);
+            //var date = Console.ReadLine();
+            //var commands = GetBooksReleasedBefore(db, date);
+            var input = Console.ReadLine();
+            var commands = GetAuthorNamesEndingIn(db, input);
             Console.WriteLine(commands);
         }
         public static string GetBooksByAgeRestriction(BookShopContext context, string command)
@@ -87,11 +89,11 @@
         }
         public static string GetBooksByCategory(BookShopContext context, string input)
         {
-            var words = input.Split(" ").Select(x=>x.ToLower()).ToList();
+            var words = input.Split(" ").Select(x => x.ToLower()).ToList();
             var books = context.BooksCategories
                 .Where(x => words.Contains(x.Category.Name.ToLower()))
-                .Select(x=>x.Book.Title)
-                .OrderBy(x=>x)
+                .Select(x => x.Book.Title)
+                .OrderBy(x => x)
                 .ToList();
             return String.Join("\n", books);
         }
@@ -100,8 +102,8 @@
             StringBuilder sb = new StringBuilder();
             var ci = new CultureInfo("EN-US");
             var books = context.Books
-                .Where(x => x.ReleaseDate < DateTime.ParseExact(date,"dd-MM-yyyy",ci))
-                .OrderByDescending(x=>x.ReleaseDate)
+                .Where(x => x.ReleaseDate < DateTime.ParseExact(date, "dd-MM-yyyy", ci))
+                .OrderByDescending(x => x.ReleaseDate)
                 .Select(x => new
                 {
                     Title = x.Title,
@@ -114,6 +116,15 @@
                 sb.AppendLine($"{book.Title} - {book.Edition} - ${book.Price:f2}");
             }
             return sb.ToString().TrimEnd();
+        }
+        public static string GetAuthorNamesEndingIn(BookShopContext context, string input)
+        {
+            var sqlPattern = $"%{input}";
+            var authors = context.Authors
+                .Where(x => EF.Functions.Like(x.FirstName, sqlPattern))
+                .Select(x => $"{x.FirstName} {x.LastName}")
+                .ToList();
+            return String.Join(Environment.NewLine, authors.OrderBy(x => x));
         }
     }
 }
