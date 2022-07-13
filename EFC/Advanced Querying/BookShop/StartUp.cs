@@ -27,7 +27,8 @@
             //var date = Console.ReadLine();
             //var commands = GetBooksReleasedBefore(db, date);
             var input = Console.ReadLine();
-            var commands = GetAuthorNamesEndingIn(db, input);
+            //var commands = GetAuthorNamesEndingIn(db, input);
+            var commands = GetBookTitlesContaining(db, input);
             Console.WriteLine(commands);
         }
         public static string GetBooksByAgeRestriction(BookShopContext context, string command)
@@ -124,6 +125,16 @@
                 .Select(x => $"{x.FirstName} {x.LastName}")
                 .ToList();
             return String.Join(Environment.NewLine, authors.OrderBy(x => x));
+        }
+        public static string GetBookTitlesContaining(BookShopContext context, string input)
+        {
+            input = input.ToLower();
+            var titles = context.Books
+                .Where(x => x.Title.ToLower().Contains(input))
+                .Select(x => x.Title)
+                .OrderBy(x => x)
+                .ToList();
+            return String.Join(Environment.NewLine, titles);
         }
     }
 }
