@@ -100,9 +100,8 @@
         public static string GetBooksReleasedBefore(BookShopContext context, string date)
         {
             StringBuilder sb = new StringBuilder();
-            var ci = new CultureInfo("EN-US");
             var books = context.Books
-                .Where(x => x.ReleaseDate < DateTime.ParseExact(date, "dd-MM-yyyy", ci))
+                .Where(x => x.ReleaseDate < DateTime.ParseExact(date, "dd-MM-yyyy", CultureInfo.InvariantCulture))
                 .OrderByDescending(x => x.ReleaseDate)
                 .Select(x => new
                 {
