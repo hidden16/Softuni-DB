@@ -28,7 +28,8 @@
             //var commands = GetBooksReleasedBefore(db, date);
             var input = Console.ReadLine();
             //var commands = GetAuthorNamesEndingIn(db, input);
-            var commands = GetBookTitlesContaining(db, input);
+           // var commands = GetBookTitlesContaining(db, input);
+            var commands = GetBooksByAuthor(db, input);
             Console.WriteLine(commands);
         }
         public static string GetBooksByAgeRestriction(BookShopContext context, string command)
@@ -135,6 +136,17 @@
                 .OrderBy(x => x)
                 .ToList();
             return String.Join(Environment.NewLine, titles);
+        }
+        public static string GetBooksByAuthor(BookShopContext context, string input)
+        {
+            var pattern = $"{input.ToLower()}%";
+            var titlesAuthors = context.Books
+                .Include(x => x.Author)
+                .Where(x => EF.Functions.Like(x.Author.LastName, pattern))
+                .OrderBy(x=>x.BookId)
+                .Select(x=> $"{x.Title} ({x.Author.FirstName} {x.Author.LastName})")
+                .ToList();
+            return String.Join(Environment.NewLine, titlesAuthors);
         }
     }
 }
