@@ -36,8 +36,9 @@
             //var commands = CountCopiesByAuthor(db);
             //var commands = GetTotalProfitByCategory(db);
             //var commands = GetMostRecentBooks(db);
-            IncreasePrices(db);
-            //Console.WriteLine(commands);
+            //IncreasePrices(db);
+            int commands = RemoveBooks(db);
+            Console.WriteLine(commands);
         }
         public static string GetBooksByAgeRestriction(BookShopContext context, string command)
         {
@@ -212,6 +213,18 @@
                 book.Price += 5;
             }
             context.SaveChanges();
+        }
+        public static int RemoveBooks(BookShopContext context)
+        {
+            var toDelete = context.Books.Where(x=>x.Copies < 4200).ToList();
+            var counter = 0;
+            foreach (var item in toDelete)
+            {
+                counter++;
+                context.Books.Remove(item);
+            }
+            context.SaveChanges();
+            return counter;
         }
     }
 }
