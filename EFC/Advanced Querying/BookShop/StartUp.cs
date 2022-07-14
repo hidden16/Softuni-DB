@@ -33,7 +33,8 @@
             //var commands = GetBooksByAuthor(db, input);
             //var input = int.Parse(Console.ReadLine());
             //var commands = CountBooks(db, input);
-            var commands = CountCopiesByAuthor(db);
+            //var commands = CountCopiesByAuthor(db);
+            var commands = GetTotalProfitByCategory(db);
             Console.WriteLine(commands);
         }
         public static string GetBooksByAgeRestriction(BookShopContext context, string command)
@@ -163,10 +164,22 @@
         {
             var authorCopies = context.Authors
                 .Include(x => x.Books)
-                .OrderByDescending(x=>x.Books.Select(x=>x.Copies).Sum())
-                .Select(x => $"{x.FirstName} {x.LastName} - {x.Books.Select(x=>x.Copies).Sum()}")
+                .OrderByDescending(x => x.Books.Select(x => x.Copies).Sum())
+                .Select(x => $"{x.FirstName} {x.LastName} - {x.Books.Select(x => x.Copies).Sum()}")
                 .ToList();
             return String.Join(Environment.NewLine, authorCopies);
+        }
+        public static string GetTotalProfitByCategory(BookShopContext context)
+        {
+            StringBuilder sb = new StringBuilder();
+            var categoryProfit = context.Categories
+                .Include(x=>x.CategoryBooks)
+                .OrderByDescending(x=> x.CategoryBooks.Select(x => x.Book.Copies * x.Book.Price).Sum())
+                .ThenBy(x=>x.Name)
+                .Select(x => $"{x.Name} ${x.CategoryBooks.Select(x => x.Book.Copies * x.Book.Price).Sum():f2}")
+                .ToList();
+           
+            return String.Join(Environment.NewLine, categoryProfit);
         }
     }
 }
