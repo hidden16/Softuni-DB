@@ -35,8 +35,9 @@
             //var commands = CountBooks(db, input);
             //var commands = CountCopiesByAuthor(db);
             //var commands = GetTotalProfitByCategory(db);
-            var commands = GetMostRecentBooks(db);
-            Console.WriteLine(commands);
+            //var commands = GetMostRecentBooks(db);
+            IncreasePrices(db);
+            //Console.WriteLine(commands);
         }
         public static string GetBooksByAgeRestriction(BookShopContext context, string command)
         {
@@ -202,6 +203,15 @@
                 }
             }
             return sb.ToString().TrimEnd();
+        }
+        public static void IncreasePrices(BookShopContext context)
+        {
+            var books = context.Books;
+            foreach (var book in books)
+            {
+                book.Price += 5;
+            }
+            context.SaveChanges();
         }
     }
 }
