@@ -34,7 +34,8 @@
             //var input = int.Parse(Console.ReadLine());
             //var commands = CountBooks(db, input);
             //var commands = CountCopiesByAuthor(db);
-            var commands = GetTotalProfitByCategory(db);
+            //var commands = GetTotalProfitByCategory(db);
+            var commands = GetMostRecentBooks(db);
             Console.WriteLine(commands);
         }
         public static string GetBooksByAgeRestriction(BookShopContext context, string command)
@@ -180,6 +181,27 @@
                 .ToList();
            
             return String.Join(Environment.NewLine, categoryProfit);
+        }
+        public static string GetMostRecentBooks(BookShopContext context)
+        {
+            StringBuilder sb = new StringBuilder();
+            var categoryBooks = context.Categories
+                .Include(x => x.CategoryBooks)
+                .Select(x=> new
+                {
+                    Name = x.Name,
+                    Movies = x.CategoryBooks.OrderByDescending(x => x.Book.ReleaseDate).Select(x=> $"{x.Book.Title} ({x.Book.ReleaseDate.Value.Year})").Take(3)
+                })
+                .ToList();
+            foreach (var category in categoryBooks.OrderBy(x=>x.Name))
+            {
+                sb.AppendLine($"--{category.Name}");
+                foreach (var title in category.Movies)
+                {
+                    sb.AppendLine($"{title}");
+                }
+            }
+            return sb.ToString().TrimEnd();
         }
     }
 }
