@@ -39,7 +39,10 @@ namespace ProductShop
             //Console.WriteLine(GetProductsInRange(context));
 
             //ex 6
-            Console.WriteLine(GetSoldProducts(context));
+            //Console.WriteLine(GetSoldProducts(context));
+
+            //ex 7
+            Console.WriteLine(GetCategoriesByProductsCount(context));
         }
         public static string ImportUsers(ProductShopContext context, string inputJson)
         {
@@ -155,7 +158,30 @@ namespace ProductShop
         }
         public static string GetCategoriesByProductsCount(ProductShopContext context)
         {
-
+            var productsCount = context.Categories
+                .Include(x => x.CategoryProducts)
+                .ThenInclude(x => x.Product)
+               .OrderByDescending(x => x.CategoryProducts.Count())
+               .Select(x => new CategoriesProductsDto()
+               {
+                   Category = x.Name,
+                   ProductsCount = x.CategoryProducts.Count(),
+                   AveragePrice = $"{x.CategoryProducts.Average(x => x.Product.Price):f2}",
+                   TotalRevenue = $"{x.CategoryProducts.Sum(x => x.Product.Price):f2}"
+               })
+               .ToList();
+            DefaultContractResolver resolver = new DefaultContractResolver()
+            {
+                NamingStrategy = new CamelCaseNamingStrategy()
+            };
+            var config = new JsonSerializerSettings()
+            {
+                Formatting = Formatting.Indented,
+                ContractResolver = resolver
+            };
+            var productsToJson = JsonConvert.SerializeObject(productsCount,config);
+            File.WriteAllText(@"D:\Git\Softuni-DB\EFC\JSON Processing\ProductShop\Datasets\categories-by-products-count.json", productsToJson);
+            return productsToJson;
         }
     }
 }
