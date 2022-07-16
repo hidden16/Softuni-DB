@@ -1,0 +1,13 @@
+D:\Git\Softuni-DB\EFC\JSON Processing\ProductShop\bin\Debug\netcoreapp2.1\ProductShop.deps.json
+D:\Git\Softuni-DB\EFC\JSON Processing\ProductShop\bin\Debug\netcoreapp2.1\ProductShop.runtimeconfig.json
+D:\Git\Softuni-DB\EFC\JSON Processing\ProductShop\bin\Debug\netcoreapp2.1\ProductShop.runtimeconfig.dev.json
+D:\Git\Softuni-DB\EFC\JSON Processing\ProductShop\bin\Debug\netcoreapp2.1\ProductShop.dll
+D:\Git\Softuni-DB\EFC\JSON Processing\ProductShop\bin\Debug\netcoreapp2.1\ProductShop.pdb
+D:\Git\Softuni-DB\EFC\JSON Processing\ProductShop\obj\Debug\netcoreapp2.1\ProductShop.csproj.AssemblyReference.cache
+D:\Git\Softuni-DB\EFC\JSON Processing\ProductShop\obj\Debug\netcoreapp2.1\ProductShop.GeneratedMSBuildEditorConfig.editorconfig
+D:\Git\Softuni-DB\EFC\JSON Processing\ProductShop\obj\Debug\netcoreapp2.1\ProductShop.AssemblyInfoInputs.cache
+D:\Git\Softuni-DB\EFC\JSON Processing\ProductShop\obj\Debug\netcoreapp2.1\ProductShop.AssemblyInfo.cs
+D:\Git\Softuni-DB\EFC\JSON Processing\ProductShop\obj\Debug\netcoreapp2.1\ProductShop.csproj.CoreCompileInputs.cache
+D:\Git\Softuni-DB\EFC\JSON Processing\ProductShop\obj\Debug\netcoreapp2.1\ProductShop.dll
+D:\Git\Softuni-DB\EFC\JSON Processing\ProductShop\obj\Debug\netcoreapp2.1\ProductShop.pdb
+D:\Git\Softuni-DB\EFC\JSON Processing\ProductShop\obj\Debug\netcoreapp2.1\ProductShop.genruntimeconfig.cache
