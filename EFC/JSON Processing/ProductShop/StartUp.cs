@@ -20,8 +20,12 @@ namespace ProductShop
             //Console.WriteLine(ImportUsers(context, inputJson));
 
             //ex2
-            var inputJson = File.ReadAllText(@"D:\Git\Softuni-DB\EFC\JSON Processing\ProductShop\Datasets\products.json");
-            Console.WriteLine(ImportProducts(context, inputJson));
+            //var inputJson = File.ReadAllText(@"D:\Git\Softuni-DB\EFC\JSON Processing\ProductShop\Datasets\products.json");
+            //Console.WriteLine(ImportProducts(context, inputJson));  
+
+            //ex 3
+            var inputJson = File.ReadAllText(@"D:\Git\Softuni-DB\EFC\JSON Processing\ProductShop\Datasets\categories.json");
+            Console.WriteLine(ImportCategories(context, inputJson));
         }
         public static string ImportUsers(ProductShopContext context, string inputJson)
         {
@@ -55,6 +59,20 @@ namespace ProductShop
             context.Products.AddRange(products);
             context.SaveChanges();
             return $"Successfully imported {products.Length}";
+        }
+        public static string ImportCategories(ProductShopContext context, string inputJson)
+        {
+            var categories = JsonConvert.DeserializeObject<CategoryInputDto[]>(inputJson)
+                .Where(x=> !string.IsNullOrEmpty(x.Name));
+            var mapperConfig = new MapperConfiguration(cfg =>
+            {
+                cfg.AddProfile<ProductShopProfile>();
+            });
+            IMapper mapper = new Mapper(mapperConfig);
+            var mappedCategories = mapper.Map<Category[]>(categories);
+            context.Categories.AddRange(mappedCategories);
+            context.SaveChanges();
+            return $"Successfully imported {categories.Count()}";
         }
     }
 }
