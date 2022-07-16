@@ -6,6 +6,7 @@ using AutoMapper;
 using Newtonsoft.Json;
 using ProductShop.Data;
 using ProductShop.Dtos.Input;
+using ProductShop.Dtos.Output;
 using ProductShop.Models;
 
 namespace ProductShop
@@ -28,8 +29,11 @@ namespace ProductShop
             //Console.WriteLine(ImportCategories(context, inputJson));
 
             //ex 4
-            var inputJson = File.ReadAllText(@"D:\Git\Softuni-DB\EFC\JSON Processing\ProductShop\Datasets\categories-products.json");
-            Console.WriteLine(ImportCategoryProducts(context, inputJson));
+            //var inputJson = File.ReadAllText(@"D:\Git\Softuni-DB\EFC\JSON Processing\ProductShop\Datasets\categories-products.json");
+            //Console.WriteLine(ImportCategoryProducts(context, inputJson));
+
+            //ex 5
+            Console.WriteLine(GetProductsInRange(context));
         }
         public static string ImportUsers(ProductShopContext context, string inputJson)
         {
@@ -90,6 +94,22 @@ namespace ProductShop
             context.CategoryProducts.AddRange(categoryProductsMapper);
             context.SaveChanges();
             return $"Successfully imported {categoryProducts.Length}";
+        }
+        public static string GetProductsInRange(ProductShopContext context)
+        {
+            var productsInRange = context.Products
+                .Where(x => x.Price >= 500 && x.Price <= 1000)
+                .OrderBy(x=>x.Price)
+                .Select(x => new ProductOutputDto
+                {
+                    name = x.Name,
+                    price = x.Price,
+                    seller = $"{x.Seller.FirstName} {x.Seller.LastName}"
+                });
+
+            var jsonProducts = JsonConvert.SerializeObject(productsInRange);
+            File.WriteAllText(@"D:\Git\Softuni-DB\EFC\JSON Processing\ProductShop\Datasets\products-in-range.json", jsonProducts);
+            return jsonProducts;
         }
     }
 }
