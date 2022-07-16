@@ -124,12 +124,12 @@ namespace ProductShop
                 .Where(x => x.ProductsSold.Count() != 0 && x.ProductsSold.Any(x=>x.Buyer != null))
                 .OrderBy(x => x.LastName)
                 .ThenBy(x => x.FirstName)
-                .Select(x => new
+                .Select(x => new UserOutputDto()
                 {
                     FirstName = x.FirstName,
                     LastName = x.LastName,
                     SoldProducts = x.ProductsSold
-                    .Select(x => new
+                    .Select(x => new SoldProductsDto()
                     {
                         Name = x.Name,
                         Price = x.Price,
@@ -152,6 +152,10 @@ namespace ProductShop
             var usersToJson = JsonConvert.SerializeObject(userSoldProducts, config);
             File.WriteAllText(@"D:\Git\Softuni-DB\EFC\JSON Processing\ProductShop\Datasets\users-sold-products.json", usersToJson);
             return usersToJson;
+        }
+        public static string GetCategoriesByProductsCount(ProductShopContext context)
+        {
+
         }
     }
 }
