@@ -42,7 +42,10 @@ namespace ProductShop
             //Console.WriteLine(GetSoldProducts(context));
 
             //ex 7
-            Console.WriteLine(GetCategoriesByProductsCount(context));
+            //Console.WriteLine(GetCategoriesByProductsCount(context));
+
+            //ex 8
+            Console.WriteLine(GetUsersWithProducts(context));
         }
         public static string ImportUsers(ProductShopContext context, string inputJson)
         {
@@ -124,7 +127,7 @@ namespace ProductShop
         {
             var userSoldProducts = context.Users
                 .Include(x => x.ProductsSold)
-                .Where(x => x.ProductsSold.Count() != 0 && x.ProductsSold.Any(x=>x.Buyer != null))
+                .Where(x => x.ProductsSold.Count() != 0 && x.ProductsSold.Any(x => x.Buyer != null))
                 .OrderBy(x => x.LastName)
                 .ThenBy(x => x.FirstName)
                 .Select(x => new UserOutputDto()
@@ -179,9 +182,54 @@ namespace ProductShop
                 Formatting = Formatting.Indented,
                 ContractResolver = resolver
             };
-            var productsToJson = JsonConvert.SerializeObject(productsCount,config);
+            var productsToJson = JsonConvert.SerializeObject(productsCount, config);
             File.WriteAllText(@"D:\Git\Softuni-DB\EFC\JSON Processing\ProductShop\Datasets\categories-by-products-count.json", productsToJson);
             return productsToJson;
+        }
+        public static string GetUsersWithProducts(ProductShopContext context)
+        {
+            var users = context.Users
+                .Include(u => u.ProductsSold)
+                .ToList()
+                .Where(u => u.ProductsSold.Any(ps => ps.Buyer != null))
+                .OrderByDescending(x=>x.ProductsSold.Count(x=>x.Buyer != null))
+                .Select(u => new
+                {
+                    u.FirstName,
+                    u.LastName,
+                    u.Age,
+                    SoldProducts = new
+                    {
+                        Count = u.ProductsSold
+                        .Where(p => p.BuyerId != null)
+                        .Count(),
+                        Products = u.ProductsSold
+                        .Where(p => p.BuyerId != null)
+                        .Select(p => new
+                        {
+                            p.Name,
+                            p.Price
+                        })
+                        .ToList()
+                    }
+                })
+                .ToList();
+            var withUserCount = new
+            {
+                usersCount = users.Count,
+                users,
+            };
+            string json = JsonConvert.SerializeObject(withUserCount, new JsonSerializerSettings()
+            {
+                ContractResolver = new DefaultContractResolver()
+                {
+                    NamingStrategy = new CamelCaseNamingStrategy(),
+                },
+                NullValueHandling = NullValueHandling.Ignore,
+                Formatting = Formatting.Indented
+            });
+            File.WriteAllText(@"D:\Git\Softuni-DB\EFC\JSON Processing\ProductShop\Datasets\users-with-products.json", json);
+            return json;
         }
     }
 }
