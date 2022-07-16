@@ -15,8 +15,13 @@ namespace ProductShop
         public static void Main(string[] args)
         {
             ProductShopContext context = new ProductShopContext();
-            var inputJson = File.ReadAllText(@"D:\Git\Softuni-DB\EFC\JSON Processing\ProductShop\Datasets\users.json");
-            Console.WriteLine(ImportUsers(context, inputJson));
+            // ex 1
+            //var inputJson = File.ReadAllText(@"D:\Git\Softuni-DB\EFC\JSON Processing\ProductShop\Datasets\users.json");
+            //Console.WriteLine(ImportUsers(context, inputJson));
+
+            //ex2
+            var inputJson = File.ReadAllText(@"D:\Git\Softuni-DB\EFC\JSON Processing\ProductShop\Datasets\products.json");
+            Console.WriteLine(ImportProducts(context, inputJson));
         }
         public static string ImportUsers(ProductShopContext context, string inputJson)
         {
@@ -30,6 +35,19 @@ namespace ProductShop
             context.Users.AddRange(mappedUsers);
             context.SaveChanges();
             return $"Successfully imported {usersInput.Length}";
+        }
+        public static string ImportProducts(ProductShopContext context, string inputJson)
+        {
+            var products = JsonConvert.DeserializeObject<ProductInputDto[]>(inputJson);
+            var mapConfig = new MapperConfiguration(cfg =>
+            {
+                cfg.AddProfile<ProductShopProfile>();
+            });
+            IMapper map = new Mapper(mapConfig);
+            var productMap = map.Map<Product[]>(products);
+            context.Products.AddRange(productMap);
+            context.SaveChanges();
+            return $"Successfully imported {products.Length}";
         }
     }
 }
