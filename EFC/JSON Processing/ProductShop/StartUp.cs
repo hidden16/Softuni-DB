@@ -38,14 +38,21 @@ namespace ProductShop
         }
         public static string ImportProducts(ProductShopContext context, string inputJson)
         {
-            var products = JsonConvert.DeserializeObject<ProductInputDto[]>(inputJson);
+            // SOLUTION WITHOUT MAPPING
+            //var products = JsonConvert.DeserializeObject<Product[]>(inputJson);
+            //context.Products.AddRange(products);
+            //context.SaveChanges();
+            //-----------------------------------------------
+
+            // SOLUTION WITH MAPPING
+            var products = JsonConvert.DeserializeObject<Product[]>(inputJson);
             var mapConfig = new MapperConfiguration(cfg =>
             {
                 cfg.AddProfile<ProductShopProfile>();
             });
             IMapper map = new Mapper(mapConfig);
             var productMap = map.Map<Product[]>(products);
-            context.Products.AddRange(productMap);
+            context.Products.AddRange(products);
             context.SaveChanges();
             return $"Successfully imported {products.Length}";
         }
