@@ -13,6 +13,7 @@ namespace CarDealer
 {
     public class StartUp
     {
+        private static IMapper mapper;
         public static void Main(string[] args)
         {
             CarDealerContext db = new CarDealerContext();
@@ -24,17 +25,18 @@ namespace CarDealer
             //Console.WriteLine(ImportSuppliers(db, inputJson));
 
             //ex 10
-            var inputJosn = File.ReadAllText(@"D:\Git\Softuni-DB\EFC\JSON Processing\CarDealer\Datasets\parts.json");
-            Console.WriteLine(ImportParts(db, inputJosn));
+            //var inputJosn = File.ReadAllText(@"D:\Git\Softuni-DB\EFC\JSON Processing\CarDealer\Datasets\parts.json");
+            //Console.WriteLine(ImportParts(db, inputJosn));
+
+            //ex 11
+            var inputJson = File.ReadAllText(@"D:\Git\Softuni-DB\EFC\JSON Processing\CarDealer\Datasets\cars.json");
+            Console.WriteLine(ImportCars(db, inputJson));
+
         }
         public static string ImportSuppliers(CarDealerContext context, string inputJson)
         {
+            InitializeMapper();
             var suppliers = JsonConvert.DeserializeObject<SupplierDto[]>(inputJson);
-            var supplierConfig = new MapperConfiguration(cfg =>
-            {
-                cfg.AddProfile<CarDealerProfile>();
-            });
-            IMapper mapper = new Mapper(supplierConfig);
             var suppliersMapped = mapper.Map<Supplier[]>(suppliers);
             context.Suppliers.AddRange(suppliersMapped);
             context.SaveChanges();
@@ -42,19 +44,49 @@ namespace CarDealer
         }
         public static string ImportParts(CarDealerContext context, string inputJson)
         {
+            InitializeMapper();
             var suppliersCount = context.Suppliers.Count();
             var parts = JsonConvert.DeserializeObject<PartDto[]>(inputJson)
-                .Where(x=>x.SupplierId <= suppliersCount)
+                .Where(x => x.SupplierId <= suppliersCount)
                 .ToArray();
-            var partsConfig = new MapperConfiguration(cfg =>
-            {
-                cfg.AddProfile<CarDealerProfile>();
-            });
-            IMapper mapper = new Mapper(partsConfig);
             var partsMapped = mapper.Map<Part[]>(parts);
             context.Parts.AddRange(partsMapped);
             context.SaveChanges();
             return $"Successfully imported {partsMapped.Count()}.";
+        }
+        public static string ImportCars(CarDealerContext context, string inputJson)
+        {
+            var carsJson = JsonConvert.DeserializeObject<List<CarDto>>(inputJson);
+            var carsToAdd = new List<Car>();
+            foreach (var cars in carsJson)
+            {
+                var car = new Car()
+                {
+                    Make = cars.Make,
+                    Model = cars.Model,
+                    TravelledDistance = cars.TravelledDistance
+                };
+
+                foreach (var partId in cars.PartsId.Distinct())
+                {
+                    car.PartCars.Add(new PartCar()
+                    {
+                        PartId = partId
+                    });
+                }
+                carsToAdd.Add(car);
+            }
+            context.Cars.AddRange(carsToAdd);
+            context.SaveChanges();
+            return $"Successfully imported {carsToAdd.Count()}.";
+        }
+        private static void InitializeMapper()
+        {
+            var config = new MapperConfiguration(cfg =>
+            {
+                cfg.AddProfile<CarDealerProfile>();
+            });
+            mapper = config.CreateMapper();
         }
     }
 }
