@@ -12,6 +12,7 @@ namespace CarDealer
         public CarDealerProfile()
         {
             CreateMap<SupplierDto, Supplier>();
+            CreateMap<PartDto, Part>();
         }
     }
 }
