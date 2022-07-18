@@ -29,9 +29,12 @@ namespace CarDealer
             //Console.WriteLine(ImportParts(db, inputJosn));
 
             //ex 11
-            var inputJson = File.ReadAllText(@"D:\Git\Softuni-DB\EFC\JSON Processing\CarDealer\Datasets\cars.json");
-            Console.WriteLine(ImportCars(db, inputJson));
+            //var inputJson = File.ReadAllText(@"D:\Git\Softuni-DB\EFC\JSON Processing\CarDealer\Datasets\cars.json");
+            //Console.WriteLine(ImportCars(db, inputJson));
 
+            //ex 12
+            var inputJson = File.ReadAllText(@"D:\Git\Softuni-DB\EFC\JSON Processing\CarDealer\Datasets\customers.json");
+            Console.WriteLine(ImportCustomers(db,inputJson));
         }
         public static string ImportSuppliers(CarDealerContext context, string inputJson)
         {
@@ -79,6 +82,15 @@ namespace CarDealer
             context.Cars.AddRange(carsToAdd);
             context.SaveChanges();
             return $"Successfully imported {carsToAdd.Count()}.";
+        }
+        public static string ImportCustomers(CarDealerContext context, string inputJson)
+        {
+            InitializeMapper();
+            var customers = JsonConvert.DeserializeObject<CustomerDto[]>(inputJson);
+            var customersToAdd = mapper.Map<Customer[]>(customers);
+            context.Customers.AddRange(customersToAdd);
+            context.SaveChanges();
+            return $"Successfully imported {customersToAdd.Count()}."; ;
         }
         private static void InitializeMapper()
         {
