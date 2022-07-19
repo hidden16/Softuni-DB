@@ -1,28 +1,22 @@
 ﻿using CarDealer.Models;
-using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
-using System;
-
 namespace CarDealer.Data
 {
     public class CarDealerContext : DbContext
     {
+        public CarDealerContext()
+        {
+        }
         public CarDealerContext(DbContextOptions options)
             : base(options)
         {
         }
-
-        public CarDealerContext()
-        {
-        }
-
         public DbSet<Car> Cars { get; set; }
         public DbSet<Customer> Customers { get; set; }
         public DbSet<Part> Parts { get; set; }
         public DbSet<PartCar> PartCars { get; set; }
         public DbSet<Sale> Sales { get; set; }
         public DbSet<Supplier> Suppliers { get; set; }
-
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             if (!optionsBuilder.IsConfigured)
@@ -30,7 +24,6 @@ namespace CarDealer.Data
                 optionsBuilder.UseSqlServer(@"Server=IKSAN\SQLEXPRESS;Database=CarDealer;Integrated Security=True;");
             }
         }
-
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<PartCar>(e =>

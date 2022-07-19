@@ -2,13 +2,11 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text.RegularExpressions;
 using AutoMapper;
 using CarDealer.Data;
 using CarDealer.DTO.Input;
 using CarDealer.Models;
 using Newtonsoft.Json;
-
 namespace CarDealer
 {
     public class StartUp
@@ -39,6 +37,9 @@ namespace CarDealer
             //ex 13
             //var inputJsons = File.ReadAllText(@"D:\Git\Softuni-DB\EFC\JSON Processing\CarDealer\Datasets\sales.json");
             //Console.WriteLine(ImportSales(db,inputJsons));
+
+            //ex 14
+            Console.WriteLine(GetOrderedCustomers(db));
         }
         public static string ImportSuppliers(CarDealerContext context, string inputJson)
         {
@@ -104,6 +105,23 @@ namespace CarDealer
             context.Sales.AddRange(sales);
             context.SaveChanges();
             return $"Successfully imported {sales.Count()}.";
+        }
+        public static string GetOrderedCustomers(CarDealerContext context)
+        {
+            var customers = context.Customers
+                .OrderBy(x => x.BirthDate)
+                .ThenBy(x => x.IsYoungDriver)
+                .Select(x => new 
+                {
+                    Name = x.Name,
+                    BirthDate = x.BirthDate.ToString("dd/MM/yyyy"),
+                    IsYoungDriver = x.IsYoungDriver
+                })
+                .ToList();
+
+            var customersJson = JsonConvert.SerializeObject(customers);
+            File.WriteAllText(@"D:\Git\Softuni-DB\EFC\JSON Processing\CarDealer\Datasets\orderedCustomers.json", customersJson);
+            return customersJson;
         }
         private static void InitializeMapper()
         {
