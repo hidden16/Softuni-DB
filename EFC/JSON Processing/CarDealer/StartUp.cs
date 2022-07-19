@@ -6,7 +6,10 @@ using AutoMapper;
 using CarDealer.Data;
 using CarDealer.DTO.Input;
 using CarDealer.Models;
+using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
+
 namespace CarDealer
 {
     public class StartUp
@@ -45,7 +48,10 @@ namespace CarDealer
             //Console.WriteLine(GetCarsFromMakeToyota(db));
 
             //ex 16
-            Console.WriteLine(GetLocalSuppliers(db));
+            //Console.WriteLine(GetLocalSuppliers(db));
+
+            //ex 17
+            Console.WriteLine(GetCarsWithTheirListOfParts(db));
         }
         public static string ImportSuppliers(CarDealerContext context, string inputJson)
         {
@@ -160,6 +166,31 @@ namespace CarDealer
             var suppliersJson = JsonConvert.SerializeObject(suppliers);
             File.WriteAllText(@"D:\Git\Softuni-DB\EFC\JSON Processing\CarDealer\Datasets\localSuppliers.json", suppliersJson);
             return suppliersJson;
+        }
+        public static string GetCarsWithTheirListOfParts(CarDealerContext context)
+        {
+            var carsList = context.Cars
+                .Include(x => x.PartCars)
+                .ThenInclude(x => x.Part)
+                .Select(x => new
+                {
+                    car = new
+                    {
+                        x.Make,
+                        x.Model,
+                        x.TravelledDistance
+                    },
+                    parts = x.PartCars.Select(x=> new
+                    {
+                        x.Part.Name,
+                        Price = $"{x.Part.Price:f2}"
+                    })
+                    .ToArray()
+                })
+                .ToArray();
+            var carsToJson = JsonConvert.SerializeObject(carsList, Formatting.Indented);
+            File.WriteAllText(@"D:\Git\Softuni-DB\EFC\JSON Processing\CarDealer\Datasets\carsWithParts.json", carsToJson);
+            return carsToJson;
         }
         private static void InitializeMapper()
         {
