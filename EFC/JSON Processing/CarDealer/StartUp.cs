@@ -51,7 +51,10 @@ namespace CarDealer
             //Console.WriteLine(GetLocalSuppliers(db));
 
             //ex 17
-            Console.WriteLine(GetCarsWithTheirListOfParts(db));
+            //Console.WriteLine(GetCarsWithTheirListOfParts(db));
+
+            //ex 18
+            Console.WriteLine(GetTotalSalesByCustomer(db));
         }
         public static string ImportSuppliers(CarDealerContext context, string inputJson)
         {
@@ -180,7 +183,7 @@ namespace CarDealer
                         x.Model,
                         x.TravelledDistance
                     },
-                    parts = x.PartCars.Select(x=> new
+                    parts = x.PartCars.Select(x => new
                     {
                         x.Part.Name,
                         Price = $"{x.Part.Price:f2}"
@@ -191,6 +194,29 @@ namespace CarDealer
             var carsToJson = JsonConvert.SerializeObject(carsList, Formatting.Indented);
             File.WriteAllText(@"D:\Git\Softuni-DB\EFC\JSON Processing\CarDealer\Datasets\carsWithParts.json", carsToJson);
             return carsToJson;
+        }
+        public static string GetTotalSalesByCustomer(CarDealerContext context)
+        {
+            DefaultContractResolver resolver = new DefaultContractResolver()
+            {
+                NamingStrategy = new CamelCaseNamingStrategy()
+            };
+            var customers = context.Customers
+                .Where(x => x.Sales.Count() > 0)
+                .Select(x => new
+                {
+                    FullName = x.Name,
+                    BoughtCars = x.Sales.Count(),
+                    SpentMoney = x.Sales.Sum(s => s.Car.PartCars.Sum(pc => pc.Part.Price))
+                })
+                .OrderByDescending(x => x.SpentMoney)
+                .ThenByDescending(x => x.BoughtCars)
+                .ToArray();
+            var customersToJson = JsonConvert.SerializeObject(customers, Formatting.Indented, new JsonSerializerSettings()
+            {
+                 ContractResolver = resolver
+            });
+            return customersToJson;
         }
         private static void InitializeMapper()
         {
