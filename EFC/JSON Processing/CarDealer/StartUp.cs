@@ -39,7 +39,10 @@ namespace CarDealer
             //Console.WriteLine(ImportSales(db,inputJsons));
 
             //ex 14
-            Console.WriteLine(GetOrderedCustomers(db));
+            //Console.WriteLine(GetOrderedCustomers(db));
+
+            //ex 15
+            Console.WriteLine(GetCarsFromMakeToyota(db));
         }
         public static string ImportSuppliers(CarDealerContext context, string inputJson)
         {
@@ -122,6 +125,24 @@ namespace CarDealer
             var customersJson = JsonConvert.SerializeObject(customers);
             File.WriteAllText(@"D:\Git\Softuni-DB\EFC\JSON Processing\CarDealer\Datasets\orderedCustomers.json", customersJson);
             return customersJson;
+        }
+        public static string GetCarsFromMakeToyota(CarDealerContext context)
+        {
+            var cars = context.Cars
+                .Where(x => x.Make == "Toyota")
+                .OrderBy(x => x.Model)
+                .ThenByDescending(x => x.TravelledDistance)
+                .Select(x => new
+                {
+                    x.Id,
+                    x.Make,
+                    x.Model,
+                    x.TravelledDistance
+                });
+            var carsJson = JsonConvert.SerializeObject(cars);
+            File.WriteAllText(@"D:\Git\Softuni-DB\EFC\JSON Processing\CarDealer\Datasets\carsFromToyota.json", carsJson);
+
+            return carsJson;
         }
         private static void InitializeMapper()
         {
