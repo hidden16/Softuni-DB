@@ -27,8 +27,8 @@ namespace ProductShop
             //Console.WriteLine(ImportCategories(db,xml));
 
             //ex 4
-            var xml = File.ReadAllText(@"D:\Git\Softuni-DB\EFC\XML Processing\ProductShop\Datasets\categories-products.xml");
-            Console.WriteLine(ImportCategoryProducts(db,xml));
+            //var xml = File.ReadAllText(@"D:\Git\Softuni-DB\EFC\XML Processing\ProductShop\Datasets\categories-products.xml");
+            //Console.WriteLine(ImportCategoryProducts(db,xml));
         }
         public static string ImportUsers(ProductShopContext context, string inputXml)
         {
