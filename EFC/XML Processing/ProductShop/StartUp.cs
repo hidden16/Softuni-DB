@@ -89,7 +89,6 @@ namespace ProductShop
             using StringReader reader = new StringReader(inputXml);
             var categoryProductsDto = serializer.Deserialize(reader) as CategoryProductInputDto[];
             var categoryProducts = categoryProductsDto
-                .Where(x => x.CategoryId != null && x.ProductId != null)
                 .Select(x=> new CategoryProduct())
                 .ToList();
             context.CategoryProducts.AddRange(categoryProducts);
