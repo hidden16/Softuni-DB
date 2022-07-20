@@ -15,10 +15,12 @@ namespace ProductShop
             ProductShopContext db = new ProductShopContext();
 
             //ex 1
-            var xml = File.ReadAllText(@".\Datasets\users.xml");
-            Console.WriteLine(ImportUsers(db, xml));
+            //var xml = File.ReadAllText(@".\Datasets\users.xml");
+            //Console.WriteLine(ImportUsers(db, xml));
 
             //ex 2
+            var xml = File.ReadAllText(@"D:\Git\Softuni-DB\EFC\XML Processing\ProductShop\Datasets\products.xml");
+            Console.WriteLine(ImportProducts(db,xml));
         }
         public static string ImportUsers(ProductShopContext context, string inputXml)
         {
@@ -36,6 +38,24 @@ namespace ProductShop
             context.Users.AddRange(users);
             context.SaveChanges();
             return $"Successfully imported {users.Count()}.";
+        }
+        public static string ImportProducts(ProductShopContext context, string inputXml)
+        {
+            XmlRootAttribute attribute = new XmlRootAttribute("Products");
+            XmlSerializer serializer = new XmlSerializer(typeof(ProductInputDto[]), attribute);
+            using StringReader reader = new StringReader(inputXml);
+            var productsDto = serializer.Deserialize(reader)as ProductInputDto[];
+            var products = productsDto.Select(x => new Product
+            {
+                Name = x.Name,
+                Price = x.Price,
+                SellerId = x.SellerId,
+                BuyerId = x.BuyerId
+            })
+                .ToList();
+            context.Products.AddRange(products);
+            context.SaveChanges();
+            return $"Successfully imported {products.Count()}";
         }
     }
 }
