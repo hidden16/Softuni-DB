@@ -15,7 +15,7 @@ namespace ProductShop
             ProductShopContext db = new ProductShopContext();
 
             //ex 1
-            //var xml = File.ReadAllText(@".\Datasets\users.xml");
+            //var xml = File.ReadAllText(@"D:\Git\Softuni-DB\EFC\XML Processing\ProductShop\Datasets\users.xml");
             //Console.WriteLine(ImportUsers(db, xml));
 
             //ex 2
