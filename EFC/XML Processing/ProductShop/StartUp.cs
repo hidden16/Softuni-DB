@@ -23,8 +23,12 @@ namespace ProductShop
             //Console.WriteLine(ImportProducts(db,xml));
 
             //ex 3
-            var xml = File.ReadAllText(@"D:\Git\Softuni-DB\EFC\XML Processing\ProductShop\Datasets\categories.xml");
-            Console.WriteLine(ImportCategories(db,xml));
+            //var xml = File.ReadAllText(@"D:\Git\Softuni-DB\EFC\XML Processing\ProductShop\Datasets\categories.xml");
+            //Console.WriteLine(ImportCategories(db,xml));
+
+            //ex 4
+            var xml = File.ReadAllText(@"D:\Git\Softuni-DB\EFC\XML Processing\ProductShop\Datasets\categories-products.xml");
+            Console.WriteLine(ImportCategoryProducts(db,xml));
         }
         public static string ImportUsers(ProductShopContext context, string inputXml)
         {
@@ -77,6 +81,20 @@ namespace ProductShop
             context.Categories.AddRange(categories);
             context.SaveChanges();
             return $"Successfully imported {categories.Count}";
+        }
+        public static string ImportCategoryProducts(ProductShopContext context, string inputXml)
+        {
+            XmlRootAttribute attribute = new XmlRootAttribute("CategoryProducts");
+            XmlSerializer serializer = new XmlSerializer(typeof(CategoryProductInputDto[]), attribute);
+            using StringReader reader = new StringReader(inputXml);
+            var categoryProductsDto = serializer.Deserialize(reader) as CategoryProductInputDto[];
+            var categoryProducts = categoryProductsDto
+                .Where(x => x.CategoryId != null && x.ProductId != null)
+                .Select(x=> new CategoryProduct())
+                .ToList();
+            context.CategoryProducts.AddRange(categoryProducts);
+            context.SaveChanges();
+            return $"Successfully imported {categoryProducts.Count}";
         }
     }
 }
