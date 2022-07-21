@@ -25,10 +25,12 @@ namespace CarDealer
             //Console.WriteLine(ImportParts(db, inputXml));
 
             //ex 11
-            var inputXml = File.ReadAllText(@"D:\Git\Softuni-DB\EFC\XML Processing\CarDealer\Datasets\cars.xml");
-            Console.WriteLine(ImportCars(db, inputXml));
+            //var inputXml = File.ReadAllText(@"D:\Git\Softuni-DB\EFC\XML Processing\CarDealer\Datasets\cars.xml");
+            //Console.WriteLine(ImportCars(db, inputXml));
 
             //ex 12
+            var inputXml = File.ReadAllText(@"D:\Git\Softuni-DB\EFC\XML Processing\CarDealer\Datasets\customers.xml");
+            Console.WriteLine(ImportCustomers(db,inputXml));
         }
         public static string ImportSuppliers(CarDealerContext context, string inputXml)
         {
@@ -95,6 +97,21 @@ namespace CarDealer
             context.Cars.AddRange(cars);
             context.SaveChanges();
             return $"Successfully imported {cars.Count}";
+        }
+        public static string ImportCustomers(CarDealerContext context, string inputXml)
+        {
+            var customersDto = XAssist.Deserialize<CustomerImportDto>("Customers", inputXml);
+            var customers = customersDto
+                .Select(x => new Customer()
+                {
+                    Name = x.Name,
+                    BirthDate = x.BirthDate,
+                    IsYoungDriver = x.IsYoungDriver,
+                })
+                .ToList();
+            context.Customers.AddRange(customers);
+            context.SaveChanges();
+            return $"Successfully imported {customers.Count}";
         }
     }
 }
