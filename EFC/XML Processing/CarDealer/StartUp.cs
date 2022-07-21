@@ -1,6 +1,7 @@
 ﻿using CarDealer.Data;
 using CarDealer.Dtos.Import;
 using CarDealer.Models;
+using CarDealer.XmlAssistance;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -24,8 +25,8 @@ namespace CarDealer
             //Console.WriteLine(ImportParts(db, inputXml));
 
             //ex 11
-            //var inputXml = File.ReadAllText(@"D:\Git\Softuni-DB\EFC\XML Processing\CarDealer\Datasets\cars.xml");
-            //Console.WriteLine(ImportCars(db, inputXml));
+            var inputXml = File.ReadAllText(@"D:\Git\Softuni-DB\EFC\XML Processing\CarDealer\Datasets\cars.xml");
+            Console.WriteLine(ImportCars(db, inputXml));
 
             //ex 12
         }
@@ -67,10 +68,7 @@ namespace CarDealer
         }
         public static string ImportCars(CarDealerContext context, string inputXml)
         {
-            XmlRootAttribute attribute = new XmlRootAttribute("Cars");
-            XmlSerializer serializer = new XmlSerializer(typeof(CarsImportDto[]), attribute);
-            var reader = new StringReader(inputXml);
-            var carsDto = serializer.Deserialize(reader) as CarsImportDto[];
+            var carsDto = XAssist.Deserialize<CarsImportDto>("Cars", inputXml);
             var cars = new List<Car>();
             foreach (var car in carsDto)
             {
