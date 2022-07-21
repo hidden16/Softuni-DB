@@ -1,9 +1,13 @@
 ﻿using ProductShop.Data;
+using ProductShop.Dtos.Export;
 using ProductShop.Dtos.Import;
 using ProductShop.Models;
+using ProductShop.XmlAssistance;
 using System;
 using System.IO;
 using System.Linq;
+using System.Text;
+using System.Xml.Linq;
 using System.Xml.Serialization;
 
 namespace ProductShop
@@ -20,7 +24,7 @@ namespace ProductShop
 
             //ex 2
             //var xml = File.ReadAllText(@"D:\Git\Softuni-DB\EFC\XML Processing\ProductShop\Datasets\products.xml");
-            //Console.WriteLine(ImportProducts(db,xml));
+            //Console.WriteLine(ImportProducts(db, xml));
 
             //ex 3
             //var xml = File.ReadAllText(@"D:\Git\Softuni-DB\EFC\XML Processing\ProductShop\Datasets\categories.xml");
@@ -28,7 +32,10 @@ namespace ProductShop
 
             //ex 4
             //var xml = File.ReadAllText(@"D:\Git\Softuni-DB\EFC\XML Processing\ProductShop\Datasets\categories-products.xml");
-            //Console.WriteLine(ImportCategoryProducts(db,xml));
+            //Console.WriteLine(ImportCategoryProducts(db, xml));
+
+            //ex 5
+            Console.WriteLine(GetProductsInRange(db));
         }
         public static string ImportUsers(ProductShopContext context, string inputXml)
         {
@@ -52,14 +59,15 @@ namespace ProductShop
             XmlRootAttribute attribute = new XmlRootAttribute("Products");
             XmlSerializer serializer = new XmlSerializer(typeof(ProductInputDto[]), attribute);
             using StringReader reader = new StringReader(inputXml);
-            var productsDto = serializer.Deserialize(reader)as ProductInputDto[];
-            var products = productsDto.Select(x => new Product
-            {
-                Name = x.Name,
-                Price = x.Price,
-                SellerId = x.SellerId,
-                BuyerId = x.BuyerId
-            })
+            var productsDto = serializer.Deserialize(reader) as ProductInputDto[];
+            var products = productsDto
+                .Select(x => new Product
+                {
+                    Name = x.Name,
+                    Price = x.Price,
+                    SellerId = x.SellerId,
+                    BuyerId = x.BuyerId
+                })
                 .ToList();
             context.Products.AddRange(products);
             context.SaveChanges();
@@ -89,11 +97,26 @@ namespace ProductShop
             using StringReader reader = new StringReader(inputXml);
             var categoryProductsDto = serializer.Deserialize(reader) as CategoryProductInputDto[];
             var categoryProducts = categoryProductsDto
-                .Select(x=> new CategoryProduct())
+                .Select(x => new CategoryProduct())
                 .ToList();
             context.CategoryProducts.AddRange(categoryProducts);
             context.SaveChanges();
             return $"Successfully imported {categoryProducts.Count}";
+        }
+        public static string GetProductsInRange(ProductShopContext context)
+        {
+            var products = context.Products
+                .Where(x => x.Price >= 500 && x.Price <= 1000)
+                .OrderBy(x => x.Price)
+                .Take(10)
+                .Select(x => new ProductsOutputDto
+                {
+                    name = x.Name,
+                    price = x.Price,
+                    buyer = $"{x.Buyer.FirstName} {x.Buyer.LastName}"
+                })
+                .ToArray();
+            return XAssist.Serialize(products, "Products");
         }
     }
 }
