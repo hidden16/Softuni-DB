@@ -42,7 +42,10 @@ namespace ProductShop
             //Console.WriteLine(GetSoldProducts(db));
 
             //ex 7
-            Console.WriteLine(GetCategoriesByProductsCount(db));
+            //Console.WriteLine(GetCategoriesByProductsCount(db));
+
+            //ex 8
+            Console.WriteLine(GetUsersWithProducts(db));
         }
         public static string ImportUsers(ProductShopContext context, string inputXml)
         {
@@ -166,6 +169,39 @@ namespace ProductShop
                 .ThenBy(x => x.TotalRevenue)
                 .ToList();
             return XAssist.Serialize(categories, "Categories");
+        }
+        public static string GetUsersWithProducts(ProductShopContext context)
+        {
+            var usersProducts = context.Users
+                //.ToArray() for judge
+                .Where(x => x.ProductsSold.Any())
+                .OrderByDescending(x => x.ProductsSold.Count)
+                .Select(x => new UserOutputDto
+                {
+                    FirstName = x.FirstName,
+                    LastName = x.LastName,
+                    Age = x.Age,
+                    SoldProducts = new SoldProductOutputDto
+                    {
+                        Count = x.ProductsSold.Count(),
+                        Products = x.ProductsSold.Select(x => new SoldProductDto
+                        {
+                            Name = x.Name,
+                            Price = x.Price
+                        })
+                        .OrderByDescending(x=>x.Price)
+                        .ToArray()
+                    }
+                })
+                .Take(10)
+                .ToArray();
+
+            var finalUserProducts = new UserAndProductOutputDto
+            {
+                Count = context.Users.Where(x=>x.ProductsSold.Count > 0).Count(),
+                Users = usersProducts
+            };
+            return XAssist.Serialize(finalUserProducts, "Users");
         }
     }
 }
