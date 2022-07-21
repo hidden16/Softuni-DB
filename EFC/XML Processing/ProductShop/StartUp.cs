@@ -4,6 +4,7 @@ using ProductShop.Dtos.Import;
 using ProductShop.Models;
 using ProductShop.XmlAssistance;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -35,7 +36,10 @@ namespace ProductShop
             //Console.WriteLine(ImportCategoryProducts(db, xml));
 
             //ex 5
-            Console.WriteLine(GetProductsInRange(db));
+            //Console.WriteLine(GetProductsInRange(db));
+
+            //ex 6
+            Console.WriteLine(GetSoldProducts(db));
         }
         public static string ImportUsers(ProductShopContext context, string inputXml)
         {
@@ -117,6 +121,27 @@ namespace ProductShop
                 })
                 .ToArray();
             return XAssist.Serialize(products, "Products");
+        }
+        public static string GetSoldProducts(ProductShopContext context)
+        {
+            var users = context.Users
+                .Where(x => x.ProductsSold.Count() > 0)
+                .OrderBy(x => x.LastName)
+                .ThenBy(x => x.FirstName)
+                .Select(x => new UserSoldProductOutputDto
+                {
+                    FirstName = x.FirstName,
+                    LastName = x.LastName,
+                    SoldProducts = x.ProductsSold.Select(x=> new SoldProductDto
+                    {
+                        Name =x.Name,
+                        Price = x.Price
+                    })
+                    .ToArray()
+                })
+                .Take(5)
+                .ToArray();
+            return XAssist.Serialize(users, "Users");
         }
     }
 }
