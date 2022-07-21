@@ -29,8 +29,12 @@ namespace CarDealer
             //Console.WriteLine(ImportCars(db, inputXml));
 
             //ex 12
-            var inputXml = File.ReadAllText(@"D:\Git\Softuni-DB\EFC\XML Processing\CarDealer\Datasets\customers.xml");
-            Console.WriteLine(ImportCustomers(db,inputXml));
+            //var inputXml = File.ReadAllText(@"D:\Git\Softuni-DB\EFC\XML Processing\CarDealer\Datasets\customers.xml");
+            //Console.WriteLine(ImportCustomers(db, inputXml));
+
+            //ex 13
+            var inputXml = File.ReadAllText(@"D:\Git\Softuni-DB\EFC\XML Processing\CarDealer\Datasets\sales.xml");
+            Console.WriteLine(ImportSales(db, inputXml));
         }
         public static string ImportSuppliers(CarDealerContext context, string inputXml)
         {
@@ -112,6 +116,23 @@ namespace CarDealer
             context.Customers.AddRange(customers);
             context.SaveChanges();
             return $"Successfully imported {customers.Count}";
+        }
+        public static string ImportSales(CarDealerContext context, string inputXml)
+        {
+            var salesDto = XAssist.Deserialize<SalesImportDto>("Sales", inputXml);
+            var carIds = context.Cars.Select(x => x.Id).ToList();
+            var sales = salesDto
+                .Where(x => carIds.Contains(x.CarId))
+                .Select(x => new Sale()
+                {
+                    CarId = x.CarId,
+                    CustomerId = x.CustomerId,
+                    Discount = x.Discount,
+                })
+                .ToList();
+            context.Sales.AddRange(sales);
+            context.SaveChanges();
+            return $"Successfully imported {sales.Count}";
         }
     }
 }
