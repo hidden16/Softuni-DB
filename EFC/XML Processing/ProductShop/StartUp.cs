@@ -39,7 +39,10 @@ namespace ProductShop
             //Console.WriteLine(GetProductsInRange(db));
 
             //ex 6
-            Console.WriteLine(GetSoldProducts(db));
+            //Console.WriteLine(GetSoldProducts(db));
+
+            //ex 7
+            Console.WriteLine(GetCategoriesByProductsCount(db));
         }
         public static string ImportUsers(ProductShopContext context, string inputXml)
         {
@@ -101,7 +104,13 @@ namespace ProductShop
             using StringReader reader = new StringReader(inputXml);
             var categoryProductsDto = serializer.Deserialize(reader) as CategoryProductInputDto[];
             var categoryProducts = categoryProductsDto
-                .Select(x => new CategoryProduct())
+                .Where(x => context.Products.Any(y => y.Id == x.ProductId)
+                       && context.Categories.Any(y => y.Id == x.CategoryId))
+                .Select(x => new CategoryProduct
+                {
+                    ProductId = x.ProductId,
+                    CategoryId = x.CategoryId
+                })
                 .ToList();
             context.CategoryProducts.AddRange(categoryProducts);
             context.SaveChanges();
@@ -132,9 +141,9 @@ namespace ProductShop
                 {
                     FirstName = x.FirstName,
                     LastName = x.LastName,
-                    SoldProducts = x.ProductsSold.Select(x=> new SoldProductDto
+                    SoldProducts = x.ProductsSold.Select(x => new SoldProductDto
                     {
-                        Name =x.Name,
+                        Name = x.Name,
                         Price = x.Price
                     })
                     .ToArray()
@@ -142,6 +151,21 @@ namespace ProductShop
                 .Take(5)
                 .ToArray();
             return XAssist.Serialize(users, "Users");
+        }
+        public static string GetCategoriesByProductsCount(ProductShopContext context)
+        {
+            var categories = context.Categories
+                .Select(x => new CategoryByProductCountDto
+                {
+                    Name = x.Name,
+                    Count = x.CategoryProducts.Count(),
+                    AveragePrice = x.CategoryProducts.Average(x => x.Product.Price),
+                    TotalRevenue = x.CategoryProducts.Sum(x => x.Product.Price)
+                })
+                .OrderByDescending(x => x.Count)
+                .ThenBy(x => x.TotalRevenue)
+                .ToList();
+            return XAssist.Serialize(categories, "Categories");
         }
     }
 }
