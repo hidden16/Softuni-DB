@@ -1,4 +1,5 @@
 ﻿using CarDealer.Data;
+using CarDealer.Dtos.Export;
 using CarDealer.Dtos.Import;
 using CarDealer.Models;
 using CarDealer.XmlAssistance;
@@ -6,6 +7,8 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
+using System.Xml.Linq;
 using System.Xml.Serialization;
 
 namespace CarDealer
@@ -33,8 +36,14 @@ namespace CarDealer
             //Console.WriteLine(ImportCustomers(db, inputXml));
 
             //ex 13
-            var inputXml = File.ReadAllText(@"D:\Git\Softuni-DB\EFC\XML Processing\CarDealer\Datasets\sales.xml");
-            Console.WriteLine(ImportSales(db, inputXml));
+            //var inputXml = File.ReadAllText(@"D:\Git\Softuni-DB\EFC\XML Processing\CarDealer\Datasets\sales.xml");
+            //Console.WriteLine(ImportSales(db, inputXml));
+
+            //ex 14
+            //Console.WriteLine(GetCarsWithDistance(db));
+
+            //ex 15
+            Console.WriteLine(GetCarsFromMakeBmw(db));
         }
         public static string ImportSuppliers(CarDealerContext context, string inputXml)
         {
@@ -81,15 +90,15 @@ namespace CarDealer
                 var partsId = car.Parts
                     .Select(x => x.PartId)
                     .Distinct()
-                    .Where(id => context.Parts.Any(x=>x.Id == id))
+                    .Where(id => context.Parts.Any(x => x.Id == id))
                     .ToArray();
 
                 var currCar = new Car
                 {
-                    Make=car.Make,
-                    Model=car.Model,
-                    TravelledDistance=car.TravelledDistance,
-                    PartCars = partsId.Select(x=> new PartCar()
+                    Make = car.Make,
+                    Model = car.Model,
+                    TravelledDistance = car.TravelledDistance,
+                    PartCars = partsId.Select(x => new PartCar()
                     {
                         PartId = x
                     })
@@ -133,6 +142,37 @@ namespace CarDealer
             context.Sales.AddRange(sales);
             context.SaveChanges();
             return $"Successfully imported {sales.Count}";
+        }
+        public static string GetCarsWithDistance(CarDealerContext context)
+        {
+            var carsDto = context.Cars
+                .Where(x => x.TravelledDistance > 2_000_000)
+                .OrderBy(x => x.Make)
+                .ThenBy(x => x.Model)
+                .Select(x => new CarDistanceExportDto
+                {
+                    Make = x.Make,
+                    Model = x.Model,
+                    TravelledDistance = x.TravelledDistance
+                })
+                .Take(10)
+                .ToList();
+            return XAssist.Serialize(carsDto, "cars");
+        }
+        public static string GetCarsFromMakeBmw(CarDealerContext context)
+        {
+            var bmwCars = context.Cars
+                .Where(x => x.Make == "BMW")
+                .Select(x=> new CarFromBmwExportDto
+                {
+                   Id = x.Id,
+                   Model = x.Model,
+                   TravelledDistance = x.TravelledDistance
+                })
+                .OrderBy(x=>x.Model)
+                .ThenByDescending(x=>x.TravelledDistance)
+                .ToList();
+            return XAssist.Serialize(bmwCars, "cars");
         }
     }
 }

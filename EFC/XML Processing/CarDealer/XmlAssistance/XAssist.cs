@@ -10,7 +10,7 @@ namespace CarDealer.XmlAssistance
     {
         public static string Serialize<T>(T serializerType, string attribute)
         {
-            XmlSerializer serializer = new XmlSerializer(typeof(T[]), new XmlRootAttribute(attribute));
+            XmlSerializer serializer = new XmlSerializer(typeof(T), new XmlRootAttribute(attribute));
 
             XmlSerializerNamespaces namespaces = new XmlSerializerNamespaces();
             namespaces.Add("", "");
