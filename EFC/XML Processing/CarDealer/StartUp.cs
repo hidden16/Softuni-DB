@@ -49,7 +49,10 @@ namespace CarDealer
             //Console.WriteLine(GetLocalSuppliers(db));
 
             //ex 17
-            Console.WriteLine(GetCarsWithTheirListOfParts(db));
+            //Console.WriteLine(GetCarsWithTheirListOfParts(db));
+
+            //ex 18
+            Console.WriteLine(GetTotalSalesByCustomer(db));
         }
         public static string ImportSuppliers(CarDealerContext context, string inputXml)
         {
@@ -196,24 +199,38 @@ namespace CarDealer
         public static string GetCarsWithTheirListOfParts(CarDealerContext context)
         {
             var carParts = context.Cars
-                .Select(x=> new CarPartExportDto
+                .Select(x => new CarPartExportDto
                 {
                     Make = x.Make,
                     Model = x.Model,
                     TravelledDistance = x.TravelledDistance,
-                    Parts = x.PartCars.Select(c=> new PartExportDto
+                    Parts = x.PartCars.Select(c => new PartExportDto
                     {
                         Name = c.Part.Name,
                         Price = c.Part.Price
                     })
-                    .OrderByDescending(x=>x.Price)
+                    .OrderByDescending(x => x.Price)
                     .ToArray()
                 })
-                .OrderByDescending(x=>x.TravelledDistance)
-                .ThenBy(x=>x.Model)
+                .OrderByDescending(x => x.TravelledDistance)
+                .ThenBy(x => x.Model)
                 .Take(5)
                 .ToList();
             return XAssist.Serialize(carParts, "cars");
+        }
+        public static string GetTotalSalesByCustomer(CarDealerContext context)
+        {
+            var customers = context.Customers
+                .Where(x => x.Sales.Any())
+                .Select(x => new CustomerSaleExportDto
+                {
+                    FullName = x.Name,
+                    BoughtCars = x.Sales.Count,
+                    SpentMoney = x.Sales.Sum(x => x.Car.PartCars.Sum(x=>x.Part.Price))
+                })
+                .OrderByDescending(x => x.SpentMoney)
+                .ToList();
+            return XAssist.Serialize(customers, "customers");
         }
     }
 }
