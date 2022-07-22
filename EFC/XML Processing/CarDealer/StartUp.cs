@@ -43,7 +43,10 @@ namespace CarDealer
             //Console.WriteLine(GetCarsWithDistance(db));
 
             //ex 15
-            Console.WriteLine(GetCarsFromMakeBmw(db));
+            //Console.WriteLine(GetCarsFromMakeBmw(db));
+
+            //ex 16
+            Console.WriteLine(GetLocalSuppliers(db));
         }
         public static string ImportSuppliers(CarDealerContext context, string inputXml)
         {
@@ -163,16 +166,47 @@ namespace CarDealer
         {
             var bmwCars = context.Cars
                 .Where(x => x.Make == "BMW")
-                .Select(x=> new CarFromBmwExportDto
+                .Select(x => new CarFromBmwExportDto
                 {
-                   Id = x.Id,
-                   Model = x.Model,
-                   TravelledDistance = x.TravelledDistance
+                    Id = x.Id,
+                    Model = x.Model,
+                    TravelledDistance = x.TravelledDistance
                 })
-                .OrderBy(x=>x.Model)
-                .ThenByDescending(x=>x.TravelledDistance)
+                .OrderBy(x => x.Model)
+                .ThenByDescending(x => x.TravelledDistance)
                 .ToList();
             return XAssist.Serialize(bmwCars, "cars");
         }
+        public static string GetLocalSuppliers(CarDealerContext context)
+        {
+            var suppliers = context.Suppliers
+                .Where(x => !x.IsImporter)
+                .Select(x => new LocalSuppliersExportDto
+                {
+                    Id = x.Id,
+                    Name = x.Name,
+                    PartsCount = x.Parts.Count()
+                })
+                .ToList();
+            return XAssist.Serialize(suppliers, "suppliers");
+        }
+        /*
+         * "<?xml version=\"1.0\" encoding=\"utf-16\"?>
+         * <suppliers>
+         * <suplier id=\"2\" name=\"VF Corporation\" parts-count=\"3\" 
+         * /><suplier id=\"5\" name=\"Saks Inc\" parts-count=\"2\" 
+         * /><suplier id=\"8\" name=\"Nicor Inc\" parts-count=\"1\" 
+         * /><suplier id=\"10\" name=\"Level 3 Communications Inc.\" parts-count=\"1\"
+         * /><suplier id=\"12\" name=\"GenCorp Inc.\" parts-count=\"19\" 
+         * /><suplier id=\"16\" name=\"E.I. Du Pont de Nemours and Company\" parts-count=\"6\" 
+         * /><suplier id=\"17\" name=\"The Clorox Co.\" parts-count=\"4\" 
+         * /><suplier id=\"20\" name=\"Cintas Corp.\" parts-count=\"1\" 
+         * /><suplier id=\"22\" name=\"Cintas Corp.\" parts-count=\"5\" 
+         * /><suplier id=\"24\" name=\"Caterpillar Inc.\" parts-count=\"1\"
+         * /><suplier id=\"27\" name=\"Airgas, Inc.\" parts-count=\"1\" 
+         * /><suplier id=\"29\" name=\"Agway Inc.\" parts-count=\"1\" 
+         * /><suplier id=\"31\" name=\"Zale\" parts-count=\"6\"
+         * /></suppliers>";
+         */
     }
 }
