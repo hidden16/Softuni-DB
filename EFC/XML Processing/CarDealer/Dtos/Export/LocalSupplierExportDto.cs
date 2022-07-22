@@ -6,7 +6,7 @@ using System.Xml.Serialization;
 namespace CarDealer.Dtos.Export
 {
     [XmlType("suplier")]
-    public class LocalSuppliersExportDto
+    public class LocalSupplierExportDto
     {
         [XmlAttribute("id")]
         public int Id { get; set; }

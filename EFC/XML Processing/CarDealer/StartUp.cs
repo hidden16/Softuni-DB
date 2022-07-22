@@ -46,7 +46,10 @@ namespace CarDealer
             //Console.WriteLine(GetCarsFromMakeBmw(db));
 
             //ex 16
-            Console.WriteLine(GetLocalSuppliers(db));
+            //Console.WriteLine(GetLocalSuppliers(db));
+
+            //ex 17
+            Console.WriteLine(GetCarsWithTheirListOfParts(db));
         }
         public static string ImportSuppliers(CarDealerContext context, string inputXml)
         {
@@ -181,7 +184,7 @@ namespace CarDealer
         {
             var suppliers = context.Suppliers
                 .Where(x => !x.IsImporter)
-                .Select(x => new LocalSuppliersExportDto
+                .Select(x => new LocalSupplierExportDto
                 {
                     Id = x.Id,
                     Name = x.Name,
@@ -190,23 +193,27 @@ namespace CarDealer
                 .ToList();
             return XAssist.Serialize(suppliers, "suppliers");
         }
-        /*
-         * "<?xml version=\"1.0\" encoding=\"utf-16\"?>
-         * <suppliers>
-         * <suplier id=\"2\" name=\"VF Corporation\" parts-count=\"3\" 
-         * /><suplier id=\"5\" name=\"Saks Inc\" parts-count=\"2\" 
-         * /><suplier id=\"8\" name=\"Nicor Inc\" parts-count=\"1\" 
-         * /><suplier id=\"10\" name=\"Level 3 Communications Inc.\" parts-count=\"1\"
-         * /><suplier id=\"12\" name=\"GenCorp Inc.\" parts-count=\"19\" 
-         * /><suplier id=\"16\" name=\"E.I. Du Pont de Nemours and Company\" parts-count=\"6\" 
-         * /><suplier id=\"17\" name=\"The Clorox Co.\" parts-count=\"4\" 
-         * /><suplier id=\"20\" name=\"Cintas Corp.\" parts-count=\"1\" 
-         * /><suplier id=\"22\" name=\"Cintas Corp.\" parts-count=\"5\" 
-         * /><suplier id=\"24\" name=\"Caterpillar Inc.\" parts-count=\"1\"
-         * /><suplier id=\"27\" name=\"Airgas, Inc.\" parts-count=\"1\" 
-         * /><suplier id=\"29\" name=\"Agway Inc.\" parts-count=\"1\" 
-         * /><suplier id=\"31\" name=\"Zale\" parts-count=\"6\"
-         * /></suppliers>";
-         */
+        public static string GetCarsWithTheirListOfParts(CarDealerContext context)
+        {
+            var carParts = context.Cars
+                .Select(x=> new CarPartExportDto
+                {
+                    Make = x.Make,
+                    Model = x.Model,
+                    TravelledDistance = x.TravelledDistance,
+                    Parts = x.PartCars.Select(c=> new PartExportDto
+                    {
+                        Name = c.Part.Name,
+                        Price = c.Part.Price
+                    })
+                    .OrderByDescending(x=>x.Price)
+                    .ToArray()
+                })
+                .OrderByDescending(x=>x.TravelledDistance)
+                .ThenBy(x=>x.Model)
+                .Take(5)
+                .ToList();
+            return XAssist.Serialize(carParts, "cars");
+        }
     }
 }
