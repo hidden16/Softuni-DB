@@ -52,7 +52,10 @@ namespace CarDealer
             //Console.WriteLine(GetCarsWithTheirListOfParts(db));
 
             //ex 18
-            Console.WriteLine(GetTotalSalesByCustomer(db));
+            //Console.WriteLine(GetTotalSalesByCustomer(db));
+
+            //ex 19
+            Console.WriteLine(GetSalesWithAppliedDiscount(db));
         }
         public static string ImportSuppliers(CarDealerContext context, string inputXml)
         {
@@ -226,11 +229,30 @@ namespace CarDealer
                 {
                     FullName = x.Name,
                     BoughtCars = x.Sales.Count,
-                    SpentMoney = x.Sales.Sum(x => x.Car.PartCars.Sum(x=>x.Part.Price))
+                    SpentMoney = x.Sales.Sum(x => x.Car.PartCars.Sum(x => x.Part.Price))
                 })
                 .OrderByDescending(x => x.SpentMoney)
                 .ToList();
             return XAssist.Serialize(customers, "customers");
+        }
+        public static string GetSalesWithAppliedDiscount(CarDealerContext context)
+        {
+            var sales = context.Sales
+                .Select(x => new SalesWithDiscountExportDto
+                {
+                    Car = new CarExportDto
+                    {
+                        Make = x.Car.Make,
+                        Model = x.Car.Model,
+                        TravelledDistance = x.Car.TravelledDistance
+                    },
+                    Discount = x.Discount,
+                    CustomerName = x.Customer.Name,
+                    Price = x.Car.PartCars.Sum(x => x.Part.Price),
+                    PriceWithDiscount = x.Car.PartCars.Sum(x => x.Part.Price) * (1 - (x.Discount / 100))
+                })
+                .ToList();
+            return XAssist.Serialize(sales, "sales");
         }
     }
 }
