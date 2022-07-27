@@ -69,8 +69,9 @@
                     sb.AppendLine(ErrorMessage);
                     continue;
                 }
-                bool emailExist = authors.Any(x => x.Email == author.Email);
-                if (emailExist)
+                bool emailExistInArray = authors.Any(x => x.Email == author.Email);
+                bool emailExistInDb = context.Authors.Any(x=>x.Email == author.Email);
+                if (emailExistInArray && !emailExistInDb)
                 {
                     sb.AppendLine(ErrorMessage);
                     continue;
