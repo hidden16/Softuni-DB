@@ -134,10 +134,10 @@
                     sb.AppendLine(ErrorMessage);
                     continue;
                 }
-                List<CountryGun> countryGun = new List<CountryGun>();
+                List<CountryGun> countryGuns = new List<CountryGun>();
                 foreach (var countryId in gun.Countries)
                 {
-                    countryGun.Add(new CountryGun()
+                    countryGuns.Add(new CountryGun()
                     {
                         CountryId = countryId.Id
                     });
@@ -151,7 +151,7 @@
                     NumberBuild = gun.NumberBuild,
                     Range = gun.Range,
                     ShellId = gun.ShellId,
-                    CountriesGuns = countryGun
+                    CountriesGuns = countryGuns
                 };
                 sb.AppendLine(string.Format(SuccessfulImportGun, gun.GunType, gun.GunWeight, gun.BarrelLength));
                 guns.Add(gunToAdd);
