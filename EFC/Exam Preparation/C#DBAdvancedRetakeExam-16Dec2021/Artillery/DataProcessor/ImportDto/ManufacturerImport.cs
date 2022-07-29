@@ -1,18 +1,13 @@
 ﻿using Artillery.Data.Constants;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Xml.Serialization;
 
-namespace Artillery.Data.Models
+namespace Artillery.DataProcessor.ImportDto
 {
-    public class Manufacturer
+    [XmlType("Manufacturer")]
+    public class ManufacturerImport
     {
-        public Manufacturer()
-        {
-            Guns = new List<Gun>();
-        }
-        [Key]
-        public int Id { get; set; }
         [Required]
         [Index(IsUnique = true)]
         [MinLength(GlobalConstant.MANUFACTURER_MANUFACTURERNAME_MIN_LENGTH)]
@@ -22,6 +17,5 @@ namespace Artillery.Data.Models
         [MinLength(GlobalConstant.MANUFACTURER_FOUNDED_MIN_LENGTH)]
         [MaxLength(GlobalConstant.MANUFACTURER_FOUNDED_MAX_LENGTH)]
         public string Founded { get; set; }
-        public ICollection<Gun> Guns { get; set; }
     }
 }
