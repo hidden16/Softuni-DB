@@ -1,7 +1,6 @@
 ﻿namespace Theatre.DataProcessor
 {
     using Newtonsoft.Json;
-    using System;
     using System.Globalization;
     using System.IO;
     using System.Linq;
