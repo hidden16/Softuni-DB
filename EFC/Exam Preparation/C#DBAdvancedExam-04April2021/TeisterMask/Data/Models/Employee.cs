@@ -5,6 +5,10 @@ namespace TeisterMask.Data.Models
 {
     public class Employee
     {
+        public Employee()
+        {
+            EmployeesTasks = new List<EmployeeTask>();
+        }
         [Key]
         public int Id { get; set; }
         [Required]
