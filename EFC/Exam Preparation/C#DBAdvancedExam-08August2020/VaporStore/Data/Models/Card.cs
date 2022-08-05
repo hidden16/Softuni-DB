@@ -6,6 +6,10 @@ namespace VaporStore.Data.Models
 {
     public class Card
     {
+        public Card()
+        {
+            Purchases = new List<Purchase>();
+        }
         [Key]
         public int Id { get; set; }
         [Required]

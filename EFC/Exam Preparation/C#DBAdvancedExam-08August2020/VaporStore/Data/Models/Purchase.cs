@@ -16,7 +16,6 @@ namespace VaporStore.Data.Models
         // requires regex for validation -> 3 pairs of 4 uppercase letters ex. "ABCD-EFGH-1J3K"
         public string ProductKey { get; set; }
         [Required]
-        [Column(TypeName = GlobalConstant.PURCHASE_DATE_TYPE)]
         public DateTime Date { get; set; }
         [Required]
         public int CardId { get; set; }

@@ -5,6 +5,10 @@ namespace VaporStore.Data.Models
 {
     public class Developer
     {
+        public Developer()
+        {
+            Games = new List<Game>();
+        }
         [Key]
         public int Id { get; set; }
         [Required]

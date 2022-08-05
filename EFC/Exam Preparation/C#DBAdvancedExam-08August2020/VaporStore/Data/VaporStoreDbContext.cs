@@ -33,6 +33,36 @@
 
 		protected override void OnModelCreating(ModelBuilder model)
 		{
+			model.Entity<Game>()
+				.HasOne(x=>x.Developer)
+				.WithMany(x=>x.Games);
+
+			model.Entity<Game>()
+				.HasOne(x=>x.Genre)
+				.WithMany(x=>x.Games);
+
+			model.Entity<Game>()
+				.HasMany(x => x.Purchases)
+				.WithOne(x => x.Game);
+
+			model.Entity<GameTag>()
+				.HasOne(x=>x.Tag)
+				.WithMany(x=>x.GameTags);
+
+			model.Entity<GameTag>()
+				.HasOne(x=>x.Game)
+				.WithMany(x=>x.GameTags);
+
+			model.Entity<Card>()
+				.HasOne(x=>x.User)
+				.WithMany(x=>x.Cards);
+
+			model.Entity<Card>()
+				.HasMany(x=>x.Purchases)
+				.WithOne(x=>x.Card);
+
+			model.Entity<GameTag>()
+				.HasKey(x=> new {x.TagId, x.GameId});
 		}
 	}
 }
